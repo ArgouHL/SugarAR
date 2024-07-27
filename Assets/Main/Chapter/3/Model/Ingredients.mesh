@@ -6,7 +6,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: "\u5713\u5F62.003"
+  m_Name: Ingredients
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2

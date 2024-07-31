@@ -1,0 +1,54 @@
+{
+    "name": "AndriodTestInput",
+    "maps": [
+        {
+            "name": "PhoneInput",
+            "id": "90a6e3d6-ad9c-455e-8603-53ef8471ba13",
+            "actions": [
+                {
+                    "name": "Press",
+                    "type": "Button",
+                    "id": "8416de90-756c-4e45-a120-b5edd88fb06d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PressPosition",
+                    "type": "Value",
+                    "id": "d1de0d09-294e-4116-b9d0-269d38e21de1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "163a0015-5c54-485e-9375-c3266cfbec30",
+                    "path": "<Touchscreen>/Press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Press",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cc5f8e30-e757-43f1-985d-684445a29a6a",
+                    "path": "<Touchscreen>/primaryTouch/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PressPosition",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

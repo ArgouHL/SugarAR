@@ -4,10 +4,8 @@ using System.Collections;
 
 public class Camera_move : MonoBehaviour
 {
-    [SerializeField]
-    private InputAction mouseClick;
-    [SerializeField]
-    private InputAction mousePosition;
+    private InputAction TouchPressAction;
+    private InputAction TouchPositionAction;
 
     private Coroutine draUpdateCoroutine;
     public Vector2 ClickPosition;
@@ -19,58 +17,64 @@ public class Camera_move : MonoBehaviour
     private float maxRotation = 45f; // Y轴最大旋转角度
     [SerializeField]
     private float sensitivity = 0.015f; // 旋转灵敏度
+    private PlayerInput pi;
+
+    private void Awake()
+    {
+        pi = GetComponent<PlayerInput>();
+        TouchPressAction = pi.actions.FindAction("TouchPress");
+        TouchPositionAction = pi.actions.FindAction("TouchPosition");
+
+    }
+
+
     private void OnEnable()
     {
-        mouseClick.Enable();
-        mousePosition.Enable();
-        mouseClick.performed += MousePressed;
-        mouseClick.canceled += MouseReleased;
+        TouchPressAction.performed += TouchPress;
+        TouchPressAction.canceled += TouchReleased;
     }
 
     private void OnDisable()
     {
-        mouseClick.performed -= MousePressed;
-        mouseClick.canceled -= MouseReleased;
-        mouseClick.Disable();
-        mousePosition.Disable();
+        TouchPressAction.performed -= TouchPress;
+        TouchPressAction.canceled -= TouchReleased;
     }
 
-    private void MousePressed(InputAction.CallbackContext ctx)
+    private void TouchPress(InputAction.CallbackContext ctx)
     {
         // 记录按下时的鼠标位置
-        ClickPosition = mousePosition.ReadValue<Vector2>();
-		if (DebugMod ==true)
-		{
-            //Debug.Log("ClickPosition = " + ClickPosition);
-        }
-        
-
-        if (draUpdateCoroutine == null)
+        ClickPosition = TouchPositionAction.ReadValue<Vector2>();
+        if (DebugMod)
         {
-            draUpdateCoroutine = StartCoroutine(DragUpdate());
+            Debug.Log("ClickPosition = " + ClickPosition);
         }
-    }
 
-    private void MouseReleased(InputAction.CallbackContext ctx)
+		if (draUpdateCoroutine == null)
+		{
+			draUpdateCoroutine = StartCoroutine(DragUpdate());
+		}
+	}
+
+    private void TouchReleased(InputAction.CallbackContext ctx)
     {
         if (draUpdateCoroutine != null)
         {
             StopCoroutine(draUpdateCoroutine);
             draUpdateCoroutine = null;
-            if (DebugMod == true)
+            if (DebugMod)
             {
-                //Debug.Log("EndPosition = " + EndPosition);
+                Debug.Log("EndPosition = " + EndPosition);
             }
-                
         }
     }
 
     private IEnumerator DragUpdate()
     {
+        Vector3 currentRotation = transform.eulerAngles;
         while (true)
         {
             // 持续更新 EndPosition
-            EndPosition = mousePosition.ReadValue<Vector2>();
+            EndPosition = TouchPositionAction.ReadValue<Vector2>();
 
             // 计算位置差值
             float deltaX = (EndPosition.x - ClickPosition.x) * sensitivity;
@@ -84,11 +88,11 @@ public class Camera_move : MonoBehaviour
             }
 
             // 更新物体的旋转
-            Vector3 currentRotation = transform.eulerAngles;
+            
 
             // 将旋转角度转换到负值范围
             float newRotationY = NormalizeAngle(currentRotation.y + deltaX);
-            float newRotationX = Mathf.Clamp(currentRotation.x + deltaY, minRotation, maxRotation);
+            float newRotationX = Mathf.Clamp(currentRotation.x +(-deltaY), minRotation, maxRotation);
 
             // 应用旋转，使用 Quaternion.Euler
             transform.rotation = Quaternion.Euler(newRotationX, newRotationY, 0f);
@@ -105,8 +109,4 @@ public class Camera_move : MonoBehaviour
         if (angle > 180f) angle -= 360f;
         return angle;
     }
-
-
-
-
 }

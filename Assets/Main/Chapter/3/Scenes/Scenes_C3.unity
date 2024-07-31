@@ -1101,6 +1101,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 395739937}
+  - component: {fileID: 395739938}
   - component: {fileID: 395739936}
   m_Layer: 0
   m_Name: P
@@ -1121,46 +1122,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23713c18c84c7094aae142e369473b91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mouseClick:
-    m_Name: Mouse Click
-    m_Type: 1
-    m_ExpectedControlType: Button
-    m_Id: 93d2984e-84f9-4570-996a-e10fb3b9ba3f
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings:
-    - m_Name: 
-      m_Id: 078a62f1-792c-43d3-869f-460552152f9d
-      m_Path: <Mouse>/leftButton
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Mouse Click
-      m_Flags: 0
-    m_Flags: 0
-  mousePosition:
-    m_Name: Mouse Position
-    m_Type: 0
-    m_ExpectedControlType: Vector2
-    m_Id: 862afb0b-2cb3-4c79-8653-a0ff5c588294
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings:
-    - m_Name: 
-      m_Id: 91f4d39f-21dd-46b4-b44a-d02094d1ac9f
-      m_Path: <Mouse>/position
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Mouse Position
-      m_Flags: 0
-    m_Flags: 0
   ClickPosition: {x: 0, y: 0}
   EndPosition: {x: 0, y: 0}
-  DebugMod: 0
+  DebugMod: 1
   minRotation: 0
   maxRotation: 45
-  sensitivity: 0.001
+  sensitivity: 0.1
 --- !u!4 &395739937
 Transform:
   m_ObjectHideFlags: 0
@@ -1177,6 +1144,47 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 25, y: 0, z: 0}
+--- !u!114 &395739938
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 395739935}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 11af54b3c9845d94cab3421688a97fe5,
+    type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 702d328a-a5a5-45a5-b298-bbcebba13dbc
+    m_ActionName: phoneinput/TouchPress[/Device Simulator Touchscreen/press,/Simulated
+      Touchscreen/press]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 7039d06c-9d89-4622-9ae1-fc51c426efc9
+    m_ActionName: phoneinput/TouchPostion[/Device Simulator Touchscreen/primaryTouch/tap,/Simulated
+      Touchscreen/primaryTouch/tap]
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: phoneinput
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0

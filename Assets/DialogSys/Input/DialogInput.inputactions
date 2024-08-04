@@ -1,0 +1,34 @@
+{
+    "name": "DialogInput",
+    "maps": [
+        {
+            "name": "MoblieUI",
+            "id": "5b81d9b1-b39c-4749-817e-80e05c4a7a85",
+            "actions": [
+                {
+                    "name": "Press",
+                    "type": "Button",
+                    "id": "cb47eb89-5bf4-4ab2-bb3e-0d48ad1b0104",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "f65f36d2-7380-4555-a321-909d734ea6b8",
+                    "path": "<Touchscreen>/Press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Press",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

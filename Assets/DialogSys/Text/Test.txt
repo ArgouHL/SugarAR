@@ -1,0 +1,17 @@
+[Start:Unit1][Music:A][Sfx:0][NPC:0][Button:Yes,No]
+[Dialog]RichText
+[NPC:0,0]
+[Dialog]RichText1
+[NPC:1,0]
+[Dialog]RichText2
+[NPC:0,1]
+[Dialog]RichText3
+[Dialog]RichText333333
+[NPC:0,2]
+[Dialog]RichText233333
+[Dialog]RichText222233
+[End]
+
+[Start:Unit2]
+[Dialog]RichText2
+[End]

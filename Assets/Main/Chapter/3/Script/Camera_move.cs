@@ -19,8 +19,9 @@ public class Camera_move : MonoBehaviour
     [SerializeField]
     private float sensitivity = 0.015f; // 旋转灵敏度
     private PlayerInput pi;
-
-	private void Start()
+    public bool Invert_X; 
+    public bool Invert_Y; 
+    private void Start()
 	{
         //SetLocalRotation(10, 10, 10);
 
@@ -81,14 +82,27 @@ public class Camera_move : MonoBehaviour
     private IEnumerator DragUpdate()
     {
         Vector3 currentRotation = transform.eulerAngles;
+        int InvertX = 1;
+        int InvertY = 1;
+
+        if (Invert_X)
+		{
+            InvertX = InvertX * -1;
+
+        }
+        if (Invert_Y)
+        {
+            InvertY = InvertY * -1;
+
+        }
         while (true)
         {
             // 持续更新 EndPosition
             EndPosition = TouchPositionAction.ReadValue<Vector2>();
 
             // 计算位置差值
-            float deltaX = (EndPosition.x - ClickPosition.x) * -sensitivity;
-            float deltaY = (EndPosition.y - ClickPosition.y) * -sensitivity;
+            float deltaX = (EndPosition.x - ClickPosition.x) * InvertY * sensitivity;
+            float deltaY = (EndPosition.y - ClickPosition.y) * InvertX * sensitivity;
 
             if (DebugMod)
             {

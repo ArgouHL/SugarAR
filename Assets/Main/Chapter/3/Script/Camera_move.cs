@@ -57,10 +57,10 @@ public class Camera_move : MonoBehaviour
     {
         // 记录按下时的鼠标位置
         ClickPosition = TouchPositionAction.ReadValue<Vector2>();
-        //if (DebugMod)
-        //{
-        //    Debug.Log("ClickPosition = " + ClickPosition);
-        //}
+        if (DebugMod)
+        {
+            Debug.Log("ClickPosition = " + ClickPosition);
+        }
 
 		if (draUpdateCoroutine == null)
 		{
@@ -74,10 +74,10 @@ public class Camera_move : MonoBehaviour
         {
             StopCoroutine(draUpdateCoroutine);
             draUpdateCoroutine = null;
-            //if (DebugMod)
-            //{
-            //    Debug.Log("EndPosition = " + EndPosition);
-            //}
+            if (DebugMod)
+            {
+                Debug.Log("EndPosition = " + EndPosition);
+            }
         }
     }
 
@@ -129,6 +129,7 @@ public class Camera_move : MonoBehaviour
             yield return null;
         }
     }
+
 
     public void SetLocalRotation(float RotaX, float RotaY, float RotaZ)
     {

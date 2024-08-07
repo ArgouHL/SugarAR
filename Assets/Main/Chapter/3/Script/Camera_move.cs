@@ -129,6 +129,7 @@ public class Camera_move : MonoBehaviour
             yield return null;
         }
     }
+
     public void SetLocalRotation(float RotaX, float RotaY, float RotaZ)
     {
         Quaternion quaternionRotation = Quaternion.Euler(new Vector3(RotaX, RotaY, RotaZ));

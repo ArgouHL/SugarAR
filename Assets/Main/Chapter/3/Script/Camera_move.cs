@@ -55,10 +55,10 @@ public class Camera_move : MonoBehaviour
     {
         // 记录按下时的鼠标位置
         ClickPosition = TouchPositionAction.ReadValue<Vector2>();
-        if (DebugMod)
-        {
-            Debug.Log("ClickPosition = " + ClickPosition);
-        }
+        //if (DebugMod)
+        //{
+        //    Debug.Log("ClickPosition = " + ClickPosition);
+        //}
 
 		if (draUpdateCoroutine == null)
 		{
@@ -72,28 +72,38 @@ public class Camera_move : MonoBehaviour
         {
             StopCoroutine(draUpdateCoroutine);
             draUpdateCoroutine = null;
-            if (DebugMod)
-            {
-                Debug.Log("EndPosition = " + EndPosition);
-            }
+            //if (DebugMod)
+            //{
+            //    Debug.Log("EndPosition = " + EndPosition);
+            //}
         }
+    }
+
+    private float NormalizeAngle(float angle)
+    {
+        if (angle > 180)
+        {
+            angle -= 360;
+        }
+        return angle;
     }
 
     private IEnumerator DragUpdate()
     {
-        Vector3 currentRotation = transform.eulerAngles;
+        Vector3 currentRotation = transform.localEulerAngles;
+        currentRotation.x = NormalizeAngle(currentRotation.x);  // 将 X 轴的旋转角度规范化
+        currentRotation.y = NormalizeAngle(currentRotation.y);  // 将 Y 轴的旋转角度规范化
+
         int InvertX = 1;
         int InvertY = 1;
 
         if (Invert_X)
-		{
+        {
             InvertX = InvertX * -1;
-
         }
         if (Invert_Y)
         {
             InvertY = InvertY * -1;
-
         }
         while (true)
         {
@@ -104,19 +114,11 @@ public class Camera_move : MonoBehaviour
             float deltaX = (EndPosition.x - ClickPosition.x) * InvertY * sensitivity;
             float deltaY = (EndPosition.y - ClickPosition.y) * InvertX * sensitivity;
 
-            if (DebugMod)
-            {
-                Debug.Log("NowPosition = " + EndPosition);
-                Debug.Log("deltaX = " + deltaX);
-                Debug.Log("deltaY = " + deltaY);
-            }
-
             // 更新物体的旋转
-            
-
-            // 将旋转角度转换到负值范围
             float newRotationY = NormalizeAngle(currentRotation.y + deltaX);
-            float newRotationX = Mathf.Clamp(currentRotation.x +deltaY, minRotation, maxRotation);
+            float newRotationX = Mathf.Clamp(currentRotation.x + deltaY, minRotation, maxRotation);
+
+            print(currentRotation.x + "+" + deltaY);
 
             // 应用旋转，使用 Quaternion.Euler
             transform.localRotation = Quaternion.Euler(newRotationX, newRotationY, 0f);
@@ -124,14 +126,6 @@ public class Camera_move : MonoBehaviour
             // Yield execution of this coroutine and return to the main loop until next frame
             yield return null;
         }
-    }
-
-    private float NormalizeAngle(float angle)
-    {
-        // 将角度转换到 -180 到 180 度范围
-        angle = angle % 360f;
-        if (angle > 180f) angle -= 360f;
-        return angle;
     }
     public void SetLocalRotation(float RotaX, float RotaY, float RotaZ)
     {

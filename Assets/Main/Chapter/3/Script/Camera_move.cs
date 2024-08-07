@@ -20,10 +20,12 @@ public class Camera_move : MonoBehaviour
     private float sensitivity = 0.015f; // 旋转灵敏度
     private PlayerInput pi;
     public bool Invert_X; 
-    public bool Invert_Y; 
+    public bool Invert_Y;
+    public bool enableAtStart;
+
     private void Start()
 	{
-        //SetLocalRotation(10, 10, 10);
+        SetEnable(enableAtStart);
 
     }
 	private void Awake()
@@ -131,5 +133,14 @@ public class Camera_move : MonoBehaviour
     {
         Quaternion quaternionRotation = Quaternion.Euler(new Vector3(RotaX, RotaY, RotaZ));
         transform.localRotation = quaternionRotation;
+    }
+
+
+    public void SetEnable(bool enabled)
+    {
+        if (enabled)
+            pi.actions.Enable();
+        else
+            pi.actions.Disable();
     }
 }

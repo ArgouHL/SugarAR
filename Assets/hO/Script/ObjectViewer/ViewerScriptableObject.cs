@@ -10,6 +10,7 @@ public class ViewerScriptableObject : ScriptableObject
 [System.Serializable]
 public class ViewerObject
 {
+    public string keyName;
     public GameObject spawnObject;
     public Vector3 orgRotation;
 }

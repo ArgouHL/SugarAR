@@ -5,12 +5,12 @@ using UnityEngine;
 public class ViewerObjectManager : MonoBehaviour
 {
     public static ViewerObjectManager instance;
-    private GameObject nowViewerObject;
-    private Camera_move viewer;
+    public GameObject nowViewerObject;
+    private Camera_move viewer => Camera_move.instance;
     private void Awake()
     {
         instance = this;
-        viewer = Camera_move.instance;
+
     }
 
 
@@ -35,6 +35,12 @@ public class ViewerObjectManager : MonoBehaviour
             Destroy(nowViewerObject);
             nowViewerObject = null;
         }
+    }
+
+    public void Test(bool b)
+    {
+        viewer.SetEnable(b);
+        nowViewerObject.SetActive(b);
     }
 
 

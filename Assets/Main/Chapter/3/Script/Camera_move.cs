@@ -120,7 +120,11 @@ public class Camera_move : MonoBehaviour
             float newRotationY = NormalizeAngle(currentRotation.y + deltaX);
             float newRotationX = Mathf.Clamp(currentRotation.x + deltaY, minRotation, maxRotation);
 
-            print(currentRotation.x + "+" + deltaY);
+			//if (DebugMod)
+			//{
+            //    Debug.Log(currentRotation.x + "+" + deltaY);
+            //}
+            
 
             // 应用旋转，使用 Quaternion.Euler
             transform.localRotation = Quaternion.Euler(newRotationX, newRotationY, 0f);

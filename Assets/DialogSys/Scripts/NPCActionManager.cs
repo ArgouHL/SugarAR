@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ public class NPCActionManager : MonoBehaviour
     public NpcControl[] npcControls;
     public Dictionary<int, int> npcPairDict;
     private Dictionary<int, NpcSetting> npcDict => DialogSystem.instance.npcDict;
+    private bool canShowNPC;
 
     private void Awake()
     {
@@ -38,17 +40,23 @@ public class NPCActionManager : MonoBehaviour
     }
 
 
-    public void ShowNPC(int npcId, int alternativeIndex, int motionIndex =-1)
+    public void ShowNPC(int npcId, int alternativeIndex, int motionIndex = -1)
     {
+        if (!canShowNPC)
+        {
+            HideAllNPC();
+            return;
+        }
+
         if (!npcPairDict.ContainsKey(npcId))
         {
             npcPairDict.Add(npcId, npcPairDict.Count);
-           // Debug.Log("A1");
+            // Debug.Log("A1");
         }
-      //  Debug.Log("A");
+        //  Debug.Log("A");
         foreach (var npcPair in npcPairDict)
         {
-           // Debug.Log("B");
+            Debug.Log("N" + npcId);
             if (npcPair.Key == npcId)
             {
                 MotionType motion;
@@ -56,25 +64,27 @@ public class NPCActionManager : MonoBehaviour
                 {
                     Debug.LogError("Alternative is not existed. " + alternativeIndex);
                     alternativeIndex = 0;
-                  
+
 
 
                 }
                 if (motionIndex < 0)
                 {
-                     motion = npcDict[npcPair.Key].alternates[alternativeIndex].defaultMotion;
+                    motion = npcDict[npcPair.Key].alternates[alternativeIndex].defaultMotion;
                 }
                 else
                 {
-                     motion = (MotionType)motionIndex;
+                    motion = (MotionType)motionIndex;
                 }
-                    npcControls[npcPair.Value].ShowNpc(npcDict[npcPair.Key].alternates[alternativeIndex].sprite, motion);
-                //Debug.Log("C");
+                Debug.Log("=" + npcPair.Value);
+                npcControls[npcPair.Value].ShowNpc(npcDict[npcPair.Key].alternates[alternativeIndex].sprite, motion);
+
             }
             else
             {
+                Debug.Log("!=" + npcPair.Value);
                 npcControls[npcPair.Value].Gray();
-                Debug.Log("D");
+
             }
 
 
@@ -90,7 +100,8 @@ public class NPCActionManager : MonoBehaviour
 
     }
 
-
-
-
+    internal void NpcEnable(bool enabled)
+    {
+        canShowNPC = enabled;
+    }
 }

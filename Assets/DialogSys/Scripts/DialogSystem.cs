@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[DefaultExecutionOrder(-1)]
 public class DialogSystem : MonoBehaviour
 {
     #region Singleton
@@ -40,24 +41,38 @@ public class DialogSystem : MonoBehaviour
 
 
     private bool dialogOpened = false;
+
+    internal Action EnableClick(bool v)
+    {
+        throw new NotImplementedException();
+    }
+
     public CanvasGroup canvasGroup;
     public NPCActionManager nPCActionManager;
 
     private DialogInput inputActions;
+    public delegate void DialogActions();
+    public static DialogActions dialogAction;
+    public static DialogActions closeDialogAction;
+    public static DialogActions closeDialogAction_Once;
+    public static DialogActions openAR;
+
+    private bool canClick = true;
 
     private void Awake()
     {
         SingletonInit();
         inputActions = new DialogInput();
-        inputActions.Enable();
+        inputActions.Enable();       
+        LoadDialogues();
+        LoadAllNpcs();
+        CloseDialog();
     }
 
     private void Start()
     {
-        CloseDialog();
-        LoadDialogues();
-        LoadAllNpcs();
-        StartDialog("Unit1");
+      
+
 
     }
 
@@ -125,6 +140,9 @@ public class DialogSystem : MonoBehaviour
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
         canvasGroup.alpha = 0;
+        closeDialogAction?.Invoke();
+        closeDialogAction_Once?.Invoke();
+        closeDialogAction_Once = null;
     }
     private void OpenDialog()
     {
@@ -141,7 +159,7 @@ public class DialogSystem : MonoBehaviour
             OpenDialog();
         if (!unitIndexDict.ContainsKey(title))
         {
-            Debug.LogWarning(string.Format("Dialog key \"{0}\" not found.", unitIndexDict));
+            Debug.LogWarning("Dialog key [" + title+"] not found");
             return;
         }
 
@@ -178,9 +196,36 @@ public class DialogSystem : MonoBehaviour
             case DialogueTag.Dialog:
                 dialogField.text = dialogue.content;
                 break;
+            case DialogueTag.Action:
+                DialogAction();
+                break;
+            case DialogueTag.Setting:
+                DialogSetting(dialogue.content);
+                break;
         }
 
 
+    }
+
+    private void DialogSetting(string content)
+    {
+       switch(content)
+        {
+            case "NPC_On":
+                nPCActionManager.NpcEnable(true);
+                break;
+            case "NPC_Off":
+                nPCActionManager.NpcEnable(false);
+                break;
+            case "Click_Enable":
+                canClick = true;
+                break;
+            case "Click_Disable":
+                canClick = false;
+                break;
+
+
+        }
     }
 
     private void ShowNpc(Dialogue dialogue)
@@ -219,7 +264,11 @@ public class DialogSystem : MonoBehaviour
                     }
                     
                 }
-                nPCActionManager.GrayAllNPC();
+                else
+                {
+                    nPCActionManager.GrayAllNPC();  
+                }
+               
             }
         }
         else
@@ -240,8 +289,16 @@ public class DialogSystem : MonoBehaviour
 
     private void OnClick(InputAction.CallbackContext obj)
     {
+        if (!canClick)
+            return;
         NextDialog();
     }
+
+    private void DialogAction()
+    {
+
+    }
+
 }
 
 [Serializable]
@@ -267,7 +324,9 @@ public enum DialogueTag
     Sfx,
     Music,
     Button,
-    Dialog
+    Dialog,
+    Action,
+    Setting
 }
 
 

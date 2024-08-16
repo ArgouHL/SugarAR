@@ -10,19 +10,20 @@ public class ImageTrackingCtr : MonoBehaviour
 
     private ARTrackedImageManager aRTrackedImageManager;
     private ARSession aRSession;
-    private ViewerScriptableObject[] viewerScriptableObjects;
+    public ViewerScriptableObject viewerObjList;
     private Dictionary<string, ViewerObject> viewerObjectDict = new();
 
+    private Dictionary<string, GameObject> spwanedGameObject = new();
     private void Awake()
     {
         instance = this;
         aRTrackedImageManager = FindObjectOfType<ARTrackedImageManager>();
         aRSession = FindObjectOfType<ARSession>();
-        foreach (var so in viewerScriptableObjects)
-        {
-            var vo = so.viewerObject;
-            viewerObjectDict.Add(vo.keyName, vo);
+        foreach (var so in viewerObjList.viewerObjects)
+        {            
+            viewerObjectDict.Add(so.keyName, so);
         }
+        
     }
 
     private void OnEnable()
@@ -40,13 +41,10 @@ public class ImageTrackingCtr : MonoBehaviour
         {
             UpdateImage(aRTrackedImage);
         }
-        foreach (ARTrackedImage aRTrackedImage in args.updated)
-        {
-            UpdateImage(aRTrackedImage);
-        }
+      
         foreach (ARTrackedImage aRTrackedImage in args.removed)
         {
-            UpdateImage(aRTrackedImage);
+            spwanedGameObject[aRTrackedImage.referenceImage.name].SetActive(false);
         }
     }
 
@@ -56,6 +54,16 @@ public class ImageTrackingCtr : MonoBehaviour
         try
         {
             ViewerObject vo = viewerObjectDict[imageName];
+            if(!spwanedGameObject.ContainsKey(imageName))
+            {
+                ViewerObjectManager.instance.SpawnViewerObject(vo);
+            }
+            else
+            {
+                spwanedGameObject[imageName].SetActive(true);
+            }
+            //spwanedGameObject[imageName].transform.position= aRTrackedImage.transform.position;
+            //spwanedGameObject[imageName].transform.rotation = aRTrackedImage.transform.rotation;
         }
         catch(Exception err)
         {

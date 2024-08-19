@@ -11,7 +11,8 @@ public class Event_Manager : MonoBehaviour
 	public GameObject barrelWater;
 	public GameObject waterfall;
 	public GameObject WaterPlane;
-
+	public GameObject Rice;
+	public GameObject Maia;
 
 
 
@@ -72,6 +73,8 @@ public class Event_Manager : MonoBehaviour
 
 	public void EventB5()
 	{
+		Rice.transform.position = new Vector3(3, 17f, -0.22f);
+		Maia.transform.position = new Vector3(-1.9f, 17f, -0.22f);
 		anim = barrelWater.GetComponent<Animation>();
 		PlayAnim.instance.PlayAnimation(anim, "barrelWaterS5");
 		WaterPlane.transform.position = new Vector3(-0.221f, 3, -0.221f);

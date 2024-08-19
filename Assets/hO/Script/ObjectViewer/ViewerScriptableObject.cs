@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "ViewerObject", menuName = "ObjectViewer/Create ViewerObject Data", order = 1)]
 public class ViewerScriptableObject : ScriptableObject
 {
-    public ViewerObject viewerObject;
+    public ViewerObject[] viewerObjects;
 }
 
 [System.Serializable]

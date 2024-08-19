@@ -15,3 +15,6 @@ MonoBehaviour:
   npcSettingObjs:
   - {fileID: 11400000, guid: c18a40aad6d1d9a438806f2faef40614, type: 2}
   - {fileID: 11400000, guid: 279cab3904165e24c808cf1ba8290a63, type: 2}
+  - {fileID: 11400000, guid: 279cab3904165e24c808cf1ba8290a63, type: 2}
+  - {fileID: 11400000, guid: 279cab3904165e24c808cf1ba8290a63, type: 2}
+  - {fileID: 11400000, guid: 279cab3904165e24c808cf1ba8290a63, type: 2}

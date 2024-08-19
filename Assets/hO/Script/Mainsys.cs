@@ -32,4 +32,8 @@ public class Mainsys : MonoBehaviour
         ViewerObjectManager.instance.Test(enable);
         
     }
+
+
+
+
 }

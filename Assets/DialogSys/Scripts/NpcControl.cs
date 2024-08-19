@@ -30,11 +30,12 @@ public class NpcControl  : MonoBehaviour
 
     public void ShowNpc(Sprite sp, MotionType motionType = 0)
     {
-        Debug.Log("Show");
+        
         npcImage.sprite = sp;
         canvasGroup.alpha = 1;
         npcImage.color = Color.white;
-        float ratio = GetRatio(sp);
+        Debug.Log(gameObject.name + "white");
+        float ratio = MathfHelper.GetWidthRatio(sp);
         ChangeImageRatio(ratio);
         NpcMotion(motionType);
         
@@ -49,7 +50,7 @@ public class NpcControl  : MonoBehaviour
         {
             case MotionType.Jump:
                 LeanTween.sequence()
-                    .append(LeanTween.moveY(rect, orgPos.y+ jumpHeight, 0.05f).setEaseOutQuad())
+                    .append(LeanTween.moveY(rect, orgPos.y+ jumpHeight, 0.05f).setEaseOutQuad())    
                     .append(LeanTween.moveY(rect, orgPos.y,0.05f).setEaseInQuad());
                 break;
             default:
@@ -65,6 +66,8 @@ public class NpcControl  : MonoBehaviour
     internal void Gray()
     {
         npcImage.color = grayColor;
+        Debug.Log(gameObject.name + "Gray");
+
     }
 
     private void ChangeImageRatio(float ratio)
@@ -75,11 +78,6 @@ public class NpcControl  : MonoBehaviour
         npcImage.rectTransform.sizeDelta = v2;
     }
 
-    private float GetRatio(Sprite sp)
-    {
-        float width = sp.rect.width;
-        float height = sp.rect.height;
-        return width / height;
-    }
+  
 
 }

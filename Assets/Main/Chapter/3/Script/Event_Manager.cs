@@ -8,13 +8,17 @@ public class Event_Manager : MonoBehaviour
 	public GameObject lid;
 	public GameObject fire_wood;
 	public GameObject burnt;
+	public GameObject barrelWater;
+	public GameObject waterfall;
+	public GameObject WaterPlane;
 
-	
+
+
 
 	private Animation anim;
 
 
-	
+
 	public void EventB1()
 	{
 		Fire_spawn.instance.ClearFireObjects();
@@ -23,7 +27,7 @@ public class Event_Manager : MonoBehaviour
 		lid.SetActive(false);
 		burnt.SetActive(false);
 		fire_wood.SetActive(false);
-		
+
 	}
 	public void EventB2()
 	{
@@ -36,8 +40,8 @@ public class Event_Manager : MonoBehaviour
 		fire_wood.SetActive(false);
 		barrel.transform.position = new Vector3(0.2613f, 8.25f, 0.2215f);
 		anim = barrel.GetComponent<Animation>();
-		PlayAnimation("barrelS2");
-		
+		PlayAnim.instance.PlayAnimation(anim,"barrelS2");
+
 	}
 	public void EventB3()
 	{
@@ -49,9 +53,9 @@ public class Event_Manager : MonoBehaviour
 		burnt.SetActive(false);
 		fire_wood.SetActive(true);
 		anim = lid.GetComponent<Animation>();
-		PlayAnimation("lidS3");
+		PlayAnim.instance.PlayAnimation(anim, "lidS3");
 		anim = fire_wood.GetComponent<Animation>();
-		PlayAnimation("fire_woodS3");
+		PlayAnim.instance.PlayAnimation(anim, "fire_woodS3");
 
 	}
 	public void EventB4()
@@ -63,16 +67,17 @@ public class Event_Manager : MonoBehaviour
 		burnt.SetActive(true);
 		fire_wood.SetActive(false);
 		anim = lid.GetComponent<Animation>();
-		PlayAnimation("lidS4");
+		PlayAnim.instance.PlayAnimation(anim, "lidS4");
 	}
 
-
-
-	public void PlayAnimation(string animationName)
+	public void EventB5()
 	{
-		if (anim != null)
-		{
-			anim.Play(animationName);
-		}
+		anim = barrelWater.GetComponent<Animation>();
+		PlayAnim.instance.PlayAnimation(anim, "barrelWaterS5");
+		WaterPlane.transform.position = new Vector3(-0.221f, 3, -0.221f);
 	}
+
+	
+
+
 }

@@ -17,9 +17,9 @@ public class Fire_spawn : MonoBehaviour
 	public GameObject FireTorc;
 	private GameObject FireFliesContainer;
 	private GameObject FireTorcContainer;
-	private Vector3 FliesPos = new Vector3(0.3513f, 0.19f, -1.7917f);
+	private Vector3 FliesPos = new Vector3(-0.22f, 0.19f, -1.7917f);
 
-	private Vector3 FirePos = new Vector3(0.2613f, -0.921f, -1.56f);
+	private Vector3 FirePos = new Vector3(-0.22f, -0.921f, -1.56f);
 
 	public IEnumerator SpawnObjects()
 	{

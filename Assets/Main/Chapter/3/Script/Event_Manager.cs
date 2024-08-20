@@ -23,17 +23,32 @@ public class Event_Manager : MonoBehaviour
 	public void EventB1()
 	{
 		Fire_spawn.instance.ClearFireObjects();
-		Smoke_spawn.instance.ClearSmokeObjects();
-		barrel.SetActive(false);
-		lid.SetActive(false);
-		burnt.SetActive(false);
-		fire_wood.SetActive(false);
-
+		
 	}
+	//public void EventB1()
+	//{
+	//	Fire_spawn.instance.ClearFireObjects();
+	//	Smoke_spawn.instance.ClearSmokeObjects();
+	//	barrel.SetActive(false);
+	//	lid.SetActive(false);
+	//	burnt.SetActive(false);
+	//	fire_wood.SetActive(false);
+
+	//}
+
+	//private IEnumerator EventB1Coroutine()
+	//{
+	//	Fire_spawn.instance.ClearFireObjects();
+	//	Smoke_spawn.instance.ClearSmokeObjects();
+	//	barrel.SetActive(true);
+
+
+	//}
+
 	public void EventB2()
 	{
 		Fire_spawn.instance.ClearFireObjects();
-		Smoke_spawn.instance.ClearSmokeObjects();
+		
 		anim = null;
 		barrel.SetActive(true);
 		lid.SetActive(false);
@@ -46,7 +61,7 @@ public class Event_Manager : MonoBehaviour
 	}
 	public void EventB3()
 	{
-		Smoke_spawn.instance.ClearSmokeObjects();
+		
 		Fire_spawn.instance.ClearFireObjects();
 		anim = null;
 		barrel.SetActive(true);
@@ -61,7 +76,7 @@ public class Event_Manager : MonoBehaviour
 	}
 	public void EventB4()
 	{
-		Smoke_spawn.instance.ClearSmokeObjects();
+		
 		Fire_spawn.instance.ClearFireObjects();
 		barrel.SetActive(true);
 		lid.SetActive(true);

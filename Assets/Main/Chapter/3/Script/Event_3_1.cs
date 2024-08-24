@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Event_Manager : MonoBehaviour
+public class Event_3_1 : MonoBehaviour
 {
-	public static Event_Manager instance;
+	public static Event_3_1 instance;
 	public Animator chapter3_1;
 	//private Animation anim;
 	private void Awake()
@@ -17,7 +17,7 @@ public class Event_Manager : MonoBehaviour
 	public void Event3_1_Run()
 	{
 		Debug.Log("Setting Go to true");
-		chapter3_1.SetBool("GO", true);
+		chapter3_1.SetBool("Go", true);
 	}
 	public void Event3_1_loop()
 	{
@@ -25,7 +25,7 @@ public class Event_Manager : MonoBehaviour
 	}
 	public void Event3_1_Stop()
 	{
-		chapter3_1.SetBool("GO", false);
+		chapter3_1.SetBool("Go", false);
 	}
 	public void Event3_1_Stoploop()
 	{

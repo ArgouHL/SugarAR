@@ -17,6 +17,7 @@ public class ViewObjectCtr : MonoBehaviour
         aniStart?.Invoke();
         Debug.Log("StartAni");
         DialogSystem.instance.StartDialog(aniDialog);
+
         
     }
 

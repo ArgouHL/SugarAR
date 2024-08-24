@@ -8,15 +8,10 @@ public class NPCActionManager : MonoBehaviour
 {
 
     public NpcControl[] npcControls;
-    public Dictionary<int, int> npcPairDict;
+    public Dictionary<int, int> npcPairDict = new();
     private Dictionary<int, NpcSetting> npcDict => DialogSystem.instance.npcDict;
     private bool canShowNPC;
 
-    private void Awake()
-    {
-        npcPairDict = new();
-
-    }
     private void Start()
     {
         HideAllNPC();
@@ -36,8 +31,18 @@ public class NPCActionManager : MonoBehaviour
         {
             npc.Gray();
         }
+    }
+
+    public void ClearNPCs()
+    {
+        foreach (var npc in npcControls)
+        {
+            npc.HideNpc();
+        }
+        npcPairDict = new();
 
     }
+
 
 
     public void ShowNPC(int npcId, int alternativeIndex, int motionIndex = -1)
@@ -103,5 +108,9 @@ public class NPCActionManager : MonoBehaviour
     internal void NpcEnable(bool enabled)
     {
         canShowNPC = enabled;
+        if(!enabled)
+        {
+            HideAllNPC();
+        }
     }
 }

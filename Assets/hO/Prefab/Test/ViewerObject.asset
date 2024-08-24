@@ -13,7 +13,15 @@ MonoBehaviour:
   m_Name: ViewerObject
   m_EditorClassIdentifier: 
   viewerObjects:
-  - keyName: Test1Qr
+  - keyName: Ch3_AR_1
+    spawnObject: {fileID: 7578673937241140057, guid: 04e29765c0640c7478b5aac01f0c151e,
+      type: 3}
+    orgRotation: {x: 0, y: 0, z: 0}
+  - keyName: Ch3_AR_2
+    spawnObject: {fileID: 7578673937241140057, guid: 04e29765c0640c7478b5aac01f0c151e,
+      type: 3}
+    orgRotation: {x: 0, y: 0, z: 0}
+  - keyName: Ch3_AR_3
     spawnObject: {fileID: 7578673937241140057, guid: 04e29765c0640c7478b5aac01f0c151e,
       type: 3}
     orgRotation: {x: 0, y: 0, z: 0}

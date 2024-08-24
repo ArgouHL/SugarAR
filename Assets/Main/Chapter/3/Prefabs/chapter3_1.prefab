@@ -156,16 +156,16 @@ GameObject:
   m_Component:
   - component: {fileID: 5519498996586861528}
   - component: {fileID: 5519498996586861532}
-  - component: {fileID: 5519498996586861534}
-  - component: {fileID: 303605671}
   - component: {fileID: 4841517710822517493}
+  - component: {fileID: 5369360730575139435}
+  - component: {fileID: 6980199989103333227}
   m_Layer: 0
   m_Name: chapter3_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5519498996586861528
 Transform:
   m_ObjectHideFlags: 0
@@ -208,33 +208,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &5519498996586861534
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5519498996586861529}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b9a45bdc07192248b309bdcdfdf37e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Smoke: {fileID: 2339075199033658956}
---- !u!114 &303605671
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5519498996586861529}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c0a5b9534157c74c802fff1e024bff1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  FireFlies: {fileID: 5519498996941382111}
-  FireTorc: {fileID: 5831421392912643865}
 --- !u!114 &4841517710822517493
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,6 +221,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chapter3_1: {fileID: 5519498996586861532}
+--- !u!114 &5369360730575139435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5519498996586861529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b9a45bdc07192248b309bdcdfdf37e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Smoke: {fileID: 2339075199033658956}
+--- !u!114 &6980199989103333227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5519498996586861529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c0a5b9534157c74c802fff1e024bff1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FireFlies: {fileID: 5519498996941382111}
+  FireTorc: {fileID: 5831421392912643865}
 --- !u!1 &5519498996631174912
 GameObject:
   m_ObjectHideFlags: 0

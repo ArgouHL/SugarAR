@@ -14,6 +14,8 @@ public class ImageTrackingCtr : MonoBehaviour
     private Dictionary<string, ViewerObject> viewerObjectDict = new();
 
     private Dictionary<string, GameObject> spwanedGameObject = new();
+
+
     private void Awake()
     {
         instance = this;
@@ -57,6 +59,7 @@ public class ImageTrackingCtr : MonoBehaviour
             if(!spwanedGameObject.ContainsKey(imageName))
             {
                 ViewerObjectManager.instance.SpawnViewerObject(vo);
+                Mainsys.instance.EnableAR(false);
             }
             else
             {
@@ -69,5 +72,27 @@ public class ImageTrackingCtr : MonoBehaviour
         {
             Debug.LogException(err);
         }
+    }
+
+    [ContextMenu("TEST1")]
+    public void Test()
+    {
+        ViewerObject vo = viewerObjectDict["Ch3_AR_1"];
+        ViewerObjectManager.instance.SpawnViewerObject(vo);
+        Mainsys.instance.EnableAR(false);
+    }
+    [ContextMenu("TEST2")]
+    public void Test2()
+    {
+        ViewerObject vo = viewerObjectDict["Ch3_AR_2"];
+        ViewerObjectManager.instance.SpawnViewerObject(vo);
+        Mainsys.instance.EnableAR(false);
+    }
+    [ContextMenu("TEST3")]
+    public void Test3()
+    {
+        ViewerObject vo = viewerObjectDict["Ch3_AR_3"];
+        ViewerObjectManager.instance.SpawnViewerObject(vo);
+        Mainsys.instance.EnableAR(false);
     }
 }

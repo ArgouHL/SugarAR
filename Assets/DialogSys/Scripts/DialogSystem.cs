@@ -42,10 +42,7 @@ public class DialogSystem : MonoBehaviour
 
     private bool dialogOpened = false;
 
-    internal Action EnableClick(bool v)
-    {
-        throw new NotImplementedException();
-    }
+
 
     public CanvasGroup canvasGroup;
     public NPCActionManager nPCActionManager;
@@ -55,7 +52,7 @@ public class DialogSystem : MonoBehaviour
     public static DialogActions dialogAction;
     public static DialogActions closeDialogAction;
     public static DialogActions closeDialogAction_Once;
-    public static DialogActions openAR;
+
 
     private bool canClick = true;
 
@@ -69,12 +66,6 @@ public class DialogSystem : MonoBehaviour
         CloseDialog();
     }
 
-    private void Start()
-    {
-      
-
-
-    }
 
     private void OnEnable()
     {
@@ -165,6 +156,7 @@ public class DialogSystem : MonoBehaviour
 
         tempIndex = unitIndexDict[title];
         SetDialog(ref tempIndex);
+
     }
 
     public void SetDialog(int tempIndex)
@@ -197,19 +189,33 @@ public class DialogSystem : MonoBehaviour
                 dialogField.text = dialogue.content;
                 break;
             case DialogueTag.Action:
-                DialogAction();
+                DialogAction(dialogue);
+                NextDialog();
                 break;
             case DialogueTag.Setting:
-                DialogSetting(dialogue.content);
+                DialogSetting(dialogue);
+                NextDialog();
+                break;
+            case DialogueTag.AutoNext:
+                AutoToNextDialog(dialogue);
+                NextDialog();
                 break;
         }
 
 
     }
 
-    private void DialogSetting(string content)
+    private void AutoToNextDialog(Dialogue dialogue)
     {
-       switch(content)
+        if(float.TryParse(dialogue.setting[0],out float duration))
+        {
+            LeanTween.delayedCall(duration, ()=>NextDialog());
+        }     
+    }
+
+    private void DialogSetting(Dialogue content)
+    {
+       switch(content.setting[0])
         {
             case "NPC_On":
                 nPCActionManager.NpcEnable(true);
@@ -294,9 +300,19 @@ public class DialogSystem : MonoBehaviour
         NextDialog();
     }
 
-    private void DialogAction()
+    internal void EnableClick(bool b)
     {
+        canClick = b;
+    }
 
+    private void DialogAction(Dialogue dialogue)
+    {
+        switch(dialogue.setting[0])
+        {
+            case "AR":
+                Mainsys.instance.EnableAR(true);
+                break;
+        }
     }
 
 }
@@ -326,7 +342,8 @@ public enum DialogueTag
     Button,
     Dialog,
     Action,
-    Setting
+    Setting,
+    AutoNext
 }
 
 

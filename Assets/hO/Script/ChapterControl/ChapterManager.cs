@@ -26,7 +26,6 @@ public class ChapterManager : MonoBehaviour
         BackGroundManager.instance.ChangeBackGround(startBackGround);
         LeanTween.delayedCall(2,()=> FadeControl.instance.FadeIn(()=>DialogSystem.instance.StartDialog(startDialog)));
         Mainsys.instance.EnableObjectView(false);
-        DialogSystem.closeDialogAction += () => Mainsys.instance.EnableAR(true);
     }
 
     internal void NextDialog()

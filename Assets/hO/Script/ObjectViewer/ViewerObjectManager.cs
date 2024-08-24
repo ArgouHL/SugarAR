@@ -18,7 +18,7 @@ public class ViewerObjectManager : MonoBehaviour
 
     private void Start()
     {
-        dissolveMaterial.SetFloat("_AlphaClip", 0);
+        dissolveMaterial.SetFloat("_AlphaClip", 1);
     }
 
     public void SpawnViewerObject(ViewerObject viewerObject)
@@ -30,11 +30,11 @@ public class ViewerObjectManager : MonoBehaviour
         nowViewerObject.TryGetComponent<ViewObjectCtr>(out ViewObjectCtr viewObjectCtr);
         if (viewObjectCtr != null)
         {
-            Dissolve(1, 0.5f, () => viewObjectCtr.PlayAni());
-            DialogSystem.closeDialogAction_Once += ()=>Dissolve(0, 0.5f,()=> ChapterManager.instance.NextDialog());
-            LeanTween.delayedCall(viewObjectCtr.aniDuration, ()=>DialogSystem.instance.EnableClick(true));
+            Dissolve(0, 2f, () => viewObjectCtr.PlayAni());
+            DialogSystem.closeDialogAction_Once += () => Dissolve(1, 2f, () => ChapterManager.instance.NextDialog());
+            LeanTween.delayedCall(viewObjectCtr.aniDuration, () => DialogSystem.instance.EnableClick(true));
         }
-           
+
     }
 
 
@@ -42,7 +42,7 @@ public class ViewerObjectManager : MonoBehaviour
     public void CloseViewer()
     {
         viewer.SetEnable(false);
-        Dissolve(0, 0.5f, () => DestroyViewerObject());
+        Dissolve(1, 2, () => DestroyViewerObject());
     }
 
     public void DestroyViewerObject()
@@ -57,18 +57,24 @@ public class ViewerObjectManager : MonoBehaviour
     public void Test(bool b)
     {
         viewer.SetEnable(b);
-        nowViewerObject.SetActive(b);
+        if (nowViewerObject != null)
+            nowViewerObject.SetActive(b);
     }
 
 
     private void Dissolve(float target, float duration, Action action = null)
     {
         LeanTween.value(dissolveMaterial.GetFloat("_AlphaClip"), target, duration)
-            .setOnUpdate((float val) => dissolveMaterial.SetFloat("_AlphaClip", val)).setOnComplete(() =>
+            .setOnUpdate((float val) =>
             {
-                if (action != null)
-                    action.Invoke();
-            });
+                dissolveMaterial.SetFloat("_AlphaClip", val);
+                Debug.Log(val);
+            }).setOnComplete(() =>
+
+         {
+             if (action != null)
+                 action.Invoke();
+         });
     }
 
 }

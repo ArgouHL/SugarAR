@@ -75,6 +75,8 @@ public class ViewerObjectManager : MonoBehaviour
              if (action != null)
                  action.Invoke();
          });
+
+
     }
 
 }

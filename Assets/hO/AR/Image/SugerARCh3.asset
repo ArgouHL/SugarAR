@@ -27,3 +27,23 @@ MonoBehaviour:
     m_SpecifySize: 1
     m_Name: Ch3_AR_1
     m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5410815340922791435
+      m_GuidHigh: 10307436979884005779
+    m_SerializedTextureGuid:
+      m_GuidLow: 199340666575468541
+      m_GuidHigh: 17327732401716463322
+    m_Size: {x: 0.15, y: 0.15}
+    m_SpecifySize: 1
+    m_Name: Ch3_AR_2
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 4912924661456580360
+      m_GuidHigh: 3949266473137357740
+    m_SerializedTextureGuid:
+      m_GuidLow: 14574791329554350964
+      m_GuidHigh: 17078630794609832571
+    m_Size: {x: 0.15, y: 0.15}
+    m_SpecifySize: 1
+    m_Name: Ch3_AR_3
+    m_Texture: {fileID: 0}

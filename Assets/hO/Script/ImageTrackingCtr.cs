@@ -8,13 +8,18 @@ public class ImageTrackingCtr : MonoBehaviour
 {
     public static ImageTrackingCtr instance;
 
-    private ARTrackedImageManager aRTrackedImageManager;
+    internal ARTrackedImageManager aRTrackedImageManager;
     private ARSession aRSession;
     public ViewerScriptableObject viewerObjList;
     private Dictionary<string, ViewerObject> viewerObjectDict = new();
 
     private Dictionary<string, GameObject> spwanedGameObject = new();
+    private string tragetArObjectName;
 
+    internal void ResetAR()
+    {
+        aRSession.Reset();
+    }
 
     private void Awake()
     {
@@ -22,10 +27,10 @@ public class ImageTrackingCtr : MonoBehaviour
         aRTrackedImageManager = FindObjectOfType<ARTrackedImageManager>();
         aRSession = FindObjectOfType<ARSession>();
         foreach (var so in viewerObjList.viewerObjects)
-        {            
+        {
             viewerObjectDict.Add(so.keyName, so);
         }
-        
+
     }
 
     private void OnEnable()
@@ -37,13 +42,26 @@ public class ImageTrackingCtr : MonoBehaviour
         aRTrackedImageManager.trackedImagesChanged -= OnImageChange;
     }
 
+    public void SetTarget(string target)
+    {
+        tragetArObjectName = target;
+    }
+
+
     private void OnImageChange(ARTrackedImagesChangedEventArgs args)
     {
+
         foreach (ARTrackedImage aRTrackedImage in args.added)
         {
             UpdateImage(aRTrackedImage);
+            aRTrackedImage.destroyOnRemoval = true;
         }
-      
+        foreach (ARTrackedImage aRTrackedImage in args.updated)
+        {
+            if(aRTrackedImage.trackingState== UnityEngine.XR.ARSubsystems.TrackingState.Tracking)
+            UpdateImage(aRTrackedImage);
+        }
+
         foreach (ARTrackedImage aRTrackedImage in args.removed)
         {
             spwanedGameObject[aRTrackedImage.referenceImage.name].SetActive(false);
@@ -52,47 +70,32 @@ public class ImageTrackingCtr : MonoBehaviour
 
     private void UpdateImage(ARTrackedImage aRTrackedImage)
     {
+        if (tragetArObjectName != aRTrackedImage.referenceImage.name)
+            return;
         string imageName = aRTrackedImage.referenceImage.name;
+
         try
         {
             ViewerObject vo = viewerObjectDict[imageName];
-            if(!spwanedGameObject.ContainsKey(imageName))
-            {
-                ViewerObjectManager.instance.SpawnViewerObject(vo);
-                Mainsys.instance.EnableAR(false);
-            }
-            else
-            {
-                spwanedGameObject[imageName].SetActive(true);
-            }
-            //spwanedGameObject[imageName].transform.position= aRTrackedImage.transform.position;
-            //spwanedGameObject[imageName].transform.rotation = aRTrackedImage.transform.rotation;
+            ViewerObjectManager.instance.SpawnViewerObject(vo);
+            Mainsys.instance.EnableAR(false, null);
+
         }
-        catch(Exception err)
+        catch (Exception err)
         {
             Debug.LogException(err);
         }
     }
 
-    [ContextMenu("TEST1")]
+    [ContextMenu("TEST")]
     public void Test()
     {
-        ViewerObject vo = viewerObjectDict["Ch3_AR_1"];
+        if (tragetArObjectName == null || tragetArObjectName == "")
+            return;
+        ViewerObject vo = viewerObjectDict[tragetArObjectName];
         ViewerObjectManager.instance.SpawnViewerObject(vo);
-        Mainsys.instance.EnableAR(false);
+        tragetArObjectName = null;
+        Mainsys.instance.EnableAR(false, null);
     }
-    [ContextMenu("TEST2")]
-    public void Test2()
-    {
-        ViewerObject vo = viewerObjectDict["Ch3_AR_2"];
-        ViewerObjectManager.instance.SpawnViewerObject(vo);
-        Mainsys.instance.EnableAR(false);
-    }
-    [ContextMenu("TEST3")]
-    public void Test3()
-    {
-        ViewerObject vo = viewerObjectDict["Ch3_AR_3"];
-        ViewerObjectManager.instance.SpawnViewerObject(vo);
-        Mainsys.instance.EnableAR(false);
-    }
+    
 }

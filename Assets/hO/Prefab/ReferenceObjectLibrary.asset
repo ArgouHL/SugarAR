@@ -17,13 +17,13 @@ MonoBehaviour:
   m_ReferenceObjects:
   - m_GuidLow: 4916591973345915390
     m_GuidHigh: 68255749228406702
-    m_Name: Test1Qr
+    m_Name: Ch3_AR_1
     m_Entries: []
   - m_GuidLow: 4941826406931210646
     m_GuidHigh: 7061738738063156903
-    m_Name: Test2Qr
+    m_Name: Ch3_AR_2
     m_Entries: []
   - m_GuidLow: 5050882491239105665
     m_GuidHigh: 3100675459915875228
-    m_Name: Test3Qr
+    m_Name: Ch3_AR_3
     m_Entries: []

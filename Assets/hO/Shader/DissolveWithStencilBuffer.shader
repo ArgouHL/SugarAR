@@ -1,29 +1,46 @@
-Shader "Custom/DissolveS123hader"
+Shader "Custom/Dissolve With StencilBuffer"
 {
     Properties
     {
-        [IntRange] _StencilID("Stencil ID", Range(0, 255)) = 0
-        _AlphaClip("AlphaClip", Float) = 0
-        _Dissolove_Size("Dissolove Size", Float) = 0
+        [IntRange] _StencilID ("Stencil ID", Range(0, 255)) = 0
+        [HDR]_BaseColor("BaseColor", Color) = (1, 1, 1, 1)
+        [NoScaleOffset]_Albedo("Albedo", 2D) = "white" {}
+        _Metallic("Metallic", Range(0, 1)) = 0
+        _Smoothness("Smoothness", Range(0, 1)) = 0.5
+        [NoScaleOffset]_Normal("Normal", 2D) = "white" {}
+        _NormalStrength("NormalStrength", Float) = 0.5
+        [HDR]_DissolveColor("DissolveColor", Color) = (2.118547, 0.4436749, 0, 0)
+        _DissolveAmount("DissolveAmount", Range(0, 1)) = 0.33
+        _DissolveScale("DissolveScale", Float) = 40
+        _DissolveWidth("DissolveWidth", Float) = 0.02
+        [HideInInspector]_WorkflowMode("_WorkflowMode", Float) = 1
+        [HideInInspector]_CastShadows("_CastShadows", Float) = 1
+        [HideInInspector]_ReceiveShadows("_ReceiveShadows", Float) = 1
+        [HideInInspector]_Surface("_Surface", Float) = 0
+        [HideInInspector]_Blend("_Blend", Float) = 0
+        [HideInInspector]_AlphaClip("_AlphaClip", Float) = 1
+        [HideInInspector]_SrcBlend("_SrcBlend", Float) = 1
+        [HideInInspector]_DstBlend("_DstBlend", Float) = 0
+        [HideInInspector][ToggleUI]_ZWrite("_ZWrite", Float) = 1
+        [HideInInspector]_ZWriteControl("_ZWriteControl", Float) = 0
+        [HideInInspector]_ZTest("_ZTest", Float) = 4
+        [HideInInspector]_Cull("_Cull", Float) = 2
         [HideInInspector]_QueueOffset("_QueueOffset", Float) = 0
         [HideInInspector]_QueueControl("_QueueControl", Float) = -1
         [HideInInspector][NoScaleOffset]unity_Lightmaps("unity_Lightmaps", 2DArray) = "" {}
         [HideInInspector][NoScaleOffset]unity_LightmapsInd("unity_LightmapsInd", 2DArray) = "" {}
         [HideInInspector][NoScaleOffset]unity_ShadowMasks("unity_ShadowMasks", 2DArray) = "" {}
-        [HideInInspector]_ZTest("_ZTest", Float) = 4
-        [HideInInspector]_Cull("_Cull", Float) = 2
-
     }
-        SubShader
+    SubShader
+    {
+        Tags
         {
-            Tags
-            {
-            "RenderPipeline" = "UniversalPipeline"
-            "RenderType" = "Opaque"
+            "RenderPipeline"="UniversalPipeline"
+            "RenderType"="Opaque"
             "UniversalMaterialType" = "Lit"
-            "Queue" = "Geometry"
-            "ShaderGraphShader" = "true"
-            "ShaderGraphTargetId" = "UniversalLitSubTarget"
+            "Queue"="Geometry"
+            "ShaderGraphShader"="true"
+            "ShaderGraphTargetId"="UniversalLitSubTarget"
         }
         Pass
         {
@@ -32,21 +49,21 @@ Shader "Custom/DissolveS123hader"
             {
                 "LightMode" = "UniversalForward"
             }
-
-            // Render State
-          Cull[_Cull]
-            Blend Zero One
-            ZTest[_ZTest]
-            ZWrite off
-
-            Stencil
-            {
-                Ref[_StencilID]
-                Comp Always
-                Pass Replace
-                Fail Keep
-            }
         
+        // Render State
+        Cull [_Cull]
+        Blend Zero One
+        ZTest [_ZTest]
+        ZWrite off
+        
+        Stencil
+        {
+            Ref [_StencilID]
+            Comp Always
+            Pass Replace
+            Fail Keep
+        }
+
         // Debug
         // <None>
         
@@ -86,6 +103,11 @@ Shader "Custom/DissolveS123hader"
         #pragma multi_compile_fragment _ DEBUG_DISPLAY
         #pragma multi_compile_fragment _ _LIGHT_COOKIES
         #pragma multi_compile _ _CLUSTERED_RENDERING
+        #pragma shader_feature_fragment _ _SURFACE_TYPE_TRANSPARENT
+        #pragma shader_feature_local_fragment _ _ALPHAPREMULTIPLY_ON
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
+        #pragma shader_feature_local_fragment _ _SPECULAR_SETUP
+        #pragma shader_feature_local _ _RECEIVE_SHADOWS_OFF
         // GraphKeywords: <None>
         
         // Defines
@@ -108,7 +130,6 @@ Shader "Custom/DissolveS123hader"
         /* WARNING: $splice Could not find named fragment 'PassInstancing' */
         #define SHADERPASS SHADERPASS_FORWARD
         #define _FOG_FRAGMENT 1
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -297,11 +318,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -318,6 +352,11 @@ Shader "Custom/DissolveS123hader"
         #endif
         
         // Graph Functions
+        
+        void Unity_Multiply_float4_float4(float4 A, float4 B, out float4 Out)
+        {
+            Out = A * B;
+        }
         
         
         inline float Unity_SimpleNoise_RandomValue_float (float2 uv)
@@ -376,6 +415,16 @@ Shader "Custom/DissolveS123hader"
             Out = t;
         }
         
+        void Unity_Add_float(float A, float B, out float Out)
+        {
+            Out = A + B;
+        }
+        
+        void Unity_Step_float(float Edge, float In, out float Out)
+        {
+            Out = step(Edge, In);
+        }
+        
         // Custom interpolators pre vertex
         /* WARNING: $splice Could not find named fragment 'CustomInterpolatorPreVertex' */
         
@@ -412,6 +461,7 @@ Shader "Custom/DissolveS123hader"
             float3 NormalTS;
             float3 Emission;
             float Metallic;
+            float3 Specular;
             float Smoothness;
             float Occlusion;
             float Alpha;
@@ -421,17 +471,38 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
-            surface.BaseColor = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : SRGBToLinear(float3(0.5, 0.5, 0.5));
+            float4 _Property_6c461982439644bf9d737e85c82a327b_Out_0 = IsGammaSpace() ? LinearToSRGB(_BaseColor) : _BaseColor;
+            UnityTexture2D _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0 = UnityBuildTexture2DStructNoScale(_Albedo);
+            float4 _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0 = SAMPLE_TEXTURE2D(_Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.tex, _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.samplerstate, _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.GetTransformedUV(IN.uv0.xy));
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_R_4 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.r;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_G_5 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.g;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_B_6 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.b;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_A_7 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.a;
+            float4 _Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2;
+            Unity_Multiply_float4_float4(_Property_6c461982439644bf9d737e85c82a327b_Out_0, _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0, _Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2);
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
+            float _Property_f8fea11957cb45fb9a6b469138c89e78_Out_0 = _DissolveWidth;
+            float _Add_3f205e5c254a4dab86e55a3f8486e591_Out_2;
+            Unity_Add_float(_Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0, _Property_f8fea11957cb45fb9a6b469138c89e78_Out_0, _Add_3f205e5c254a4dab86e55a3f8486e591_Out_2);
+            float _Step_00d1d74712cc43f280e6203217c66678_Out_2;
+            Unity_Step_float(_SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2, _Add_3f205e5c254a4dab86e55a3f8486e591_Out_2, _Step_00d1d74712cc43f280e6203217c66678_Out_2);
+            float4 _Property_111a2d0fa9c7413eb72077338e57d2b3_Out_0 = IsGammaSpace() ? LinearToSRGB(_DissolveColor) : _DissolveColor;
+            float4 _Multiply_ae449395d456404fb648f2f15296b8a2_Out_2;
+            Unity_Multiply_float4_float4((_Step_00d1d74712cc43f280e6203217c66678_Out_2.xxxx), _Property_111a2d0fa9c7413eb72077338e57d2b3_Out_0, _Multiply_ae449395d456404fb648f2f15296b8a2_Out_2);
+            float _Property_341fe6c6f5da4941b180b17d3c652d43_Out_0 = _Metallic;
+            float _Property_83f2031ef51844d8bb56e3c562f7d67e_Out_0 = _Smoothness;
+            surface.BaseColor = (_Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2.xyz);
             surface.NormalTS = IN.TangentSpaceNormal;
-            surface.Emission = float3(0, 0, 0);
-            surface.Metallic = 0;
-            surface.Smoothness = 0.5;
+            surface.Emission = (_Multiply_ae449395d456404fb648f2f15296b8a2_Out_2.xyz);
+            surface.Metallic = _Property_341fe6c6f5da4941b180b17d3c652d43_Out_0;
+            surface.Specular = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : SRGBToLinear(float3(0.5, 0.5, 0.5));
+            surface.Smoothness = _Property_83f2031ef51844d8bb56e3c562f7d67e_Out_0;
             surface.Occlusion = 1;
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         
@@ -505,10 +576,10 @@ Shader "Custom/DissolveS123hader"
             }
         
         // Render State
-        Cull Back
-        Blend One Zero
-        ZTest LEqual
-        ZWrite On
+        Cull [_Cull]
+        Blend [_SrcBlend] [_DstBlend]
+        ZTest [_ZTest]
+        ZWrite [_ZWrite]
         
         // Debug
         // <None>
@@ -547,6 +618,11 @@ Shader "Custom/DissolveS123hader"
         #pragma multi_compile_fragment _ _LIGHT_LAYERS
         #pragma multi_compile_fragment _ _RENDER_PASS_ENABLED
         #pragma multi_compile_fragment _ DEBUG_DISPLAY
+        #pragma shader_feature_fragment _ _SURFACE_TYPE_TRANSPARENT
+        #pragma shader_feature_local_fragment _ _ALPHAPREMULTIPLY_ON
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
+        #pragma shader_feature_local_fragment _ _SPECULAR_SETUP
+        #pragma shader_feature_local _ _RECEIVE_SHADOWS_OFF
         // GraphKeywords: <None>
         
         // Defines
@@ -569,7 +645,6 @@ Shader "Custom/DissolveS123hader"
         /* WARNING: $splice Could not find named fragment 'PassInstancing' */
         #define SHADERPASS SHADERPASS_GBUFFER
         #define _FOG_FRAGMENT 1
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -758,11 +833,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -779,6 +867,11 @@ Shader "Custom/DissolveS123hader"
         #endif
         
         // Graph Functions
+        
+        void Unity_Multiply_float4_float4(float4 A, float4 B, out float4 Out)
+        {
+            Out = A * B;
+        }
         
         
         inline float Unity_SimpleNoise_RandomValue_float (float2 uv)
@@ -837,6 +930,16 @@ Shader "Custom/DissolveS123hader"
             Out = t;
         }
         
+        void Unity_Add_float(float A, float B, out float Out)
+        {
+            Out = A + B;
+        }
+        
+        void Unity_Step_float(float Edge, float In, out float Out)
+        {
+            Out = step(Edge, In);
+        }
+        
         // Custom interpolators pre vertex
         /* WARNING: $splice Could not find named fragment 'CustomInterpolatorPreVertex' */
         
@@ -873,6 +976,7 @@ Shader "Custom/DissolveS123hader"
             float3 NormalTS;
             float3 Emission;
             float Metallic;
+            float3 Specular;
             float Smoothness;
             float Occlusion;
             float Alpha;
@@ -882,18 +986,38 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _Property_ea0a90f2adcf480c9e4e6272b546beca_Out_0 = _Dissolove_Size;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
-            surface.BaseColor = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : SRGBToLinear(float3(0.5, 0.5, 0.5));
+            float4 _Property_6c461982439644bf9d737e85c82a327b_Out_0 = IsGammaSpace() ? LinearToSRGB(_BaseColor) : _BaseColor;
+            UnityTexture2D _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0 = UnityBuildTexture2DStructNoScale(_Albedo);
+            float4 _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0 = SAMPLE_TEXTURE2D(_Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.tex, _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.samplerstate, _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.GetTransformedUV(IN.uv0.xy));
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_R_4 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.r;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_G_5 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.g;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_B_6 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.b;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_A_7 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.a;
+            float4 _Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2;
+            Unity_Multiply_float4_float4(_Property_6c461982439644bf9d737e85c82a327b_Out_0, _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0, _Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2);
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
+            float _Property_f8fea11957cb45fb9a6b469138c89e78_Out_0 = _DissolveWidth;
+            float _Add_3f205e5c254a4dab86e55a3f8486e591_Out_2;
+            Unity_Add_float(_Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0, _Property_f8fea11957cb45fb9a6b469138c89e78_Out_0, _Add_3f205e5c254a4dab86e55a3f8486e591_Out_2);
+            float _Step_00d1d74712cc43f280e6203217c66678_Out_2;
+            Unity_Step_float(_SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2, _Add_3f205e5c254a4dab86e55a3f8486e591_Out_2, _Step_00d1d74712cc43f280e6203217c66678_Out_2);
+            float4 _Property_111a2d0fa9c7413eb72077338e57d2b3_Out_0 = IsGammaSpace() ? LinearToSRGB(_DissolveColor) : _DissolveColor;
+            float4 _Multiply_ae449395d456404fb648f2f15296b8a2_Out_2;
+            Unity_Multiply_float4_float4((_Step_00d1d74712cc43f280e6203217c66678_Out_2.xxxx), _Property_111a2d0fa9c7413eb72077338e57d2b3_Out_0, _Multiply_ae449395d456404fb648f2f15296b8a2_Out_2);
+            float _Property_341fe6c6f5da4941b180b17d3c652d43_Out_0 = _Metallic;
+            float _Property_83f2031ef51844d8bb56e3c562f7d67e_Out_0 = _Smoothness;
+            surface.BaseColor = (_Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2.xyz);
             surface.NormalTS = IN.TangentSpaceNormal;
-            surface.Emission = float3(0, 0, 0);
-            surface.Metallic = 0;
-            surface.Smoothness = 0.5;
+            surface.Emission = (_Multiply_ae449395d456404fb648f2f15296b8a2_Out_2.xyz);
+            surface.Metallic = _Property_341fe6c6f5da4941b180b17d3c652d43_Out_0;
+            surface.Specular = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : SRGBToLinear(float3(0.5, 0.5, 0.5));
+            surface.Smoothness = _Property_83f2031ef51844d8bb56e3c562f7d67e_Out_0;
             surface.Occlusion = 1;
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         
@@ -968,7 +1092,7 @@ Shader "Custom/DissolveS123hader"
             }
         
         // Render State
-        Cull Back
+        Cull [_Cull]
         ZTest LEqual
         ZWrite On
         ColorMask 0
@@ -994,6 +1118,7 @@ Shader "Custom/DissolveS123hader"
         
         // Keywords
         #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
         // GraphKeywords: <None>
         
         // Defines
@@ -1008,7 +1133,6 @@ Shader "Custom/DissolveS123hader"
         #define FEATURES_GRAPH_VERTEX
         /* WARNING: $splice Could not find named fragment 'PassInstancing' */
         #define SHADERPASS SHADERPASS_SHADOWCASTER
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -1136,11 +1260,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -1254,11 +1391,12 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         
@@ -1331,7 +1469,7 @@ Shader "Custom/DissolveS123hader"
             }
         
         // Render State
-        Cull Back
+        Cull [_Cull]
         ZTest LEqual
         ZWrite On
         ColorMask 0
@@ -1356,7 +1494,7 @@ Shader "Custom/DissolveS123hader"
         // HybridV1InjectedBuiltinProperties: <None>
         
         // Keywords
-        // PassKeywords: <None>
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
         // GraphKeywords: <None>
         
         // Defines
@@ -1370,7 +1508,6 @@ Shader "Custom/DissolveS123hader"
         #define FEATURES_GRAPH_VERTEX
         /* WARNING: $splice Could not find named fragment 'PassInstancing' */
         #define SHADERPASS SHADERPASS_DEPTHONLY
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -1494,11 +1631,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -1612,11 +1762,12 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         
@@ -1689,7 +1840,7 @@ Shader "Custom/DissolveS123hader"
             }
         
         // Render State
-        Cull Back
+        Cull [_Cull]
         ZTest LEqual
         ZWrite On
         
@@ -1713,7 +1864,7 @@ Shader "Custom/DissolveS123hader"
         // HybridV1InjectedBuiltinProperties: <None>
         
         // Keywords
-        // PassKeywords: <None>
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
         // GraphKeywords: <None>
         
         // Defines
@@ -1730,7 +1881,6 @@ Shader "Custom/DissolveS123hader"
         #define FEATURES_GRAPH_VERTEX
         /* WARNING: $splice Could not find named fragment 'PassInstancing' */
         #define SHADERPASS SHADERPASS_DEPTHNORMALS
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -1864,11 +2014,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -1983,12 +2146,13 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
             surface.NormalTS = IN.TangentSpaceNormal;
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         
@@ -2083,6 +2247,7 @@ Shader "Custom/DissolveS123hader"
         
         // Keywords
         #pragma shader_feature _ EDITOR_VISUALIZATION
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
         // GraphKeywords: <None>
         
         // Defines
@@ -2101,7 +2266,6 @@ Shader "Custom/DissolveS123hader"
         /* WARNING: $splice Could not find named fragment 'PassInstancing' */
         #define SHADERPASS SHADERPASS_META
         #define _FOG_FRAGMENT 1
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -2236,11 +2400,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -2257,6 +2434,11 @@ Shader "Custom/DissolveS123hader"
         #endif
         
         // Graph Functions
+        
+        void Unity_Multiply_float4_float4(float4 A, float4 B, out float4 Out)
+        {
+            Out = A * B;
+        }
         
         
         inline float Unity_SimpleNoise_RandomValue_float (float2 uv)
@@ -2315,6 +2497,16 @@ Shader "Custom/DissolveS123hader"
             Out = t;
         }
         
+        void Unity_Add_float(float A, float B, out float Out)
+        {
+            Out = A + B;
+        }
+        
+        void Unity_Step_float(float Edge, float In, out float Out)
+        {
+            Out = step(Edge, In);
+        }
+        
         // Custom interpolators pre vertex
         /* WARNING: $splice Could not find named fragment 'CustomInterpolatorPreVertex' */
         
@@ -2356,13 +2548,31 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
-            surface.BaseColor = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : SRGBToLinear(float3(0.5, 0.5, 0.5));
-            surface.Emission = float3(0, 0, 0);
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            float4 _Property_6c461982439644bf9d737e85c82a327b_Out_0 = IsGammaSpace() ? LinearToSRGB(_BaseColor) : _BaseColor;
+            UnityTexture2D _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0 = UnityBuildTexture2DStructNoScale(_Albedo);
+            float4 _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0 = SAMPLE_TEXTURE2D(_Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.tex, _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.samplerstate, _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.GetTransformedUV(IN.uv0.xy));
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_R_4 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.r;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_G_5 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.g;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_B_6 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.b;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_A_7 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.a;
+            float4 _Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2;
+            Unity_Multiply_float4_float4(_Property_6c461982439644bf9d737e85c82a327b_Out_0, _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0, _Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2);
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
+            float _Property_f8fea11957cb45fb9a6b469138c89e78_Out_0 = _DissolveWidth;
+            float _Add_3f205e5c254a4dab86e55a3f8486e591_Out_2;
+            Unity_Add_float(_Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0, _Property_f8fea11957cb45fb9a6b469138c89e78_Out_0, _Add_3f205e5c254a4dab86e55a3f8486e591_Out_2);
+            float _Step_00d1d74712cc43f280e6203217c66678_Out_2;
+            Unity_Step_float(_SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2, _Add_3f205e5c254a4dab86e55a3f8486e591_Out_2, _Step_00d1d74712cc43f280e6203217c66678_Out_2);
+            float4 _Property_111a2d0fa9c7413eb72077338e57d2b3_Out_0 = IsGammaSpace() ? LinearToSRGB(_DissolveColor) : _DissolveColor;
+            float4 _Multiply_ae449395d456404fb648f2f15296b8a2_Out_2;
+            Unity_Multiply_float4_float4((_Step_00d1d74712cc43f280e6203217c66678_Out_2.xxxx), _Property_111a2d0fa9c7413eb72077338e57d2b3_Out_0, _Multiply_ae449395d456404fb648f2f15296b8a2_Out_2);
+            surface.BaseColor = (_Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2.xyz);
+            surface.Emission = (_Multiply_ae449395d456404fb648f2f15296b8a2_Out_2.xyz);
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         
@@ -2455,7 +2665,7 @@ Shader "Custom/DissolveS123hader"
         // HybridV1InjectedBuiltinProperties: <None>
         
         // Keywords
-        // PassKeywords: <None>
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
         // GraphKeywords: <None>
         
         // Defines
@@ -2471,7 +2681,6 @@ Shader "Custom/DissolveS123hader"
         #define SHADERPASS SHADERPASS_DEPTHONLY
         #define SCENESELECTIONPASS 1
         #define ALPHA_CLIP_THRESHOLD 1
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -2595,11 +2804,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -2713,11 +2935,12 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         
@@ -2790,7 +3013,7 @@ Shader "Custom/DissolveS123hader"
             }
         
         // Render State
-        Cull Back
+        Cull [_Cull]
         
         // Debug
         // <None>
@@ -2810,7 +3033,7 @@ Shader "Custom/DissolveS123hader"
         // HybridV1InjectedBuiltinProperties: <None>
         
         // Keywords
-        // PassKeywords: <None>
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
         // GraphKeywords: <None>
         
         // Defines
@@ -2826,7 +3049,6 @@ Shader "Custom/DissolveS123hader"
         #define SHADERPASS SHADERPASS_DEPTHONLY
         #define SCENEPICKINGPASS 1
         #define ALPHA_CLIP_THRESHOLD 1
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -2950,11 +3172,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -3068,11 +3303,12 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         
@@ -3145,10 +3381,10 @@ Shader "Custom/DissolveS123hader"
             }
         
         // Render State
-        Cull Back
-        Blend One Zero
-        ZTest LEqual
-        ZWrite On
+        Cull [_Cull]
+        Blend [_SrcBlend] [_DstBlend]
+        ZTest [_ZTest]
+        ZWrite [_ZWrite]
         
         // Debug
         // <None>
@@ -3168,7 +3404,7 @@ Shader "Custom/DissolveS123hader"
         // HybridV1InjectedBuiltinProperties: <None>
         
         // Keywords
-        // PassKeywords: <None>
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
         // GraphKeywords: <None>
         
         // Defines
@@ -3182,7 +3418,6 @@ Shader "Custom/DissolveS123hader"
         #define FEATURES_GRAPH_VERTEX
         /* WARNING: $splice Could not find named fragment 'PassInstancing' */
         #define SHADERPASS SHADERPASS_2D
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -3306,11 +3541,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -3327,6 +3575,11 @@ Shader "Custom/DissolveS123hader"
         #endif
         
         // Graph Functions
+        
+        void Unity_Multiply_float4_float4(float4 A, float4 B, out float4 Out)
+        {
+            Out = A * B;
+        }
         
         
         inline float Unity_SimpleNoise_RandomValue_float (float2 uv)
@@ -3425,12 +3678,22 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
-            surface.BaseColor = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : SRGBToLinear(float3(0.5, 0.5, 0.5));
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            float4 _Property_6c461982439644bf9d737e85c82a327b_Out_0 = IsGammaSpace() ? LinearToSRGB(_BaseColor) : _BaseColor;
+            UnityTexture2D _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0 = UnityBuildTexture2DStructNoScale(_Albedo);
+            float4 _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0 = SAMPLE_TEXTURE2D(_Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.tex, _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.samplerstate, _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.GetTransformedUV(IN.uv0.xy));
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_R_4 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.r;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_G_5 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.g;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_B_6 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.b;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_A_7 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.a;
+            float4 _Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2;
+            Unity_Multiply_float4_float4(_Property_6c461982439644bf9d737e85c82a327b_Out_0, _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0, _Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2);
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
+            surface.BaseColor = (_Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2.xyz);
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         
@@ -3502,7 +3765,7 @@ Shader "Custom/DissolveS123hader"
             "RenderPipeline"="UniversalPipeline"
             "RenderType"="Opaque"
             "UniversalMaterialType" = "Lit"
-            "Queue"="AlphaTest"
+            "Queue"="Geometry"
             "ShaderGraphShader"="true"
             "ShaderGraphTargetId"="UniversalLitSubTarget"
         }
@@ -3515,14 +3778,23 @@ Shader "Custom/DissolveS123hader"
             }
         
         // Render State
-        Cull Back
-        Blend One Zero
-        ZTest LEqual
-        ZWrite On
+        Cull [_Cull]
+        Blend Zero One
+        ZTest [_ZTest]
+        ZWrite Off
         
         // Debug
         // <None>
         
+        Stencil
+        {
+            Ref [_StencilID]
+            Comp Always
+            Pass Replace
+            Fail Keep
+        }
+
+
         // --------------------------------------------------
         // Pass
         
@@ -3558,6 +3830,11 @@ Shader "Custom/DissolveS123hader"
         #pragma multi_compile_fragment _ DEBUG_DISPLAY
         #pragma multi_compile_fragment _ _LIGHT_COOKIES
         #pragma multi_compile _ _CLUSTERED_RENDERING
+        #pragma shader_feature_fragment _ _SURFACE_TYPE_TRANSPARENT
+        #pragma shader_feature_local_fragment _ _ALPHAPREMULTIPLY_ON
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
+        #pragma shader_feature_local_fragment _ _SPECULAR_SETUP
+        #pragma shader_feature_local _ _RECEIVE_SHADOWS_OFF
         // GraphKeywords: <None>
         
         // Defines
@@ -3580,7 +3857,6 @@ Shader "Custom/DissolveS123hader"
         /* WARNING: $splice Could not find named fragment 'PassInstancing' */
         #define SHADERPASS SHADERPASS_FORWARD
         #define _FOG_FRAGMENT 1
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -3769,11 +4045,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -3790,6 +4079,11 @@ Shader "Custom/DissolveS123hader"
         #endif
         
         // Graph Functions
+        
+        void Unity_Multiply_float4_float4(float4 A, float4 B, out float4 Out)
+        {
+            Out = A * B;
+        }
         
         
         inline float Unity_SimpleNoise_RandomValue_float (float2 uv)
@@ -3848,6 +4142,16 @@ Shader "Custom/DissolveS123hader"
             Out = t;
         }
         
+        void Unity_Add_float(float A, float B, out float Out)
+        {
+            Out = A + B;
+        }
+        
+        void Unity_Step_float(float Edge, float In, out float Out)
+        {
+            Out = step(Edge, In);
+        }
+        
         // Custom interpolators pre vertex
         /* WARNING: $splice Could not find named fragment 'CustomInterpolatorPreVertex' */
         
@@ -3884,6 +4188,7 @@ Shader "Custom/DissolveS123hader"
             float3 NormalTS;
             float3 Emission;
             float Metallic;
+            float3 Specular;
             float Smoothness;
             float Occlusion;
             float Alpha;
@@ -3893,17 +4198,38 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
-            surface.BaseColor = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : SRGBToLinear(float3(0.5, 0.5, 0.5));
+            float4 _Property_6c461982439644bf9d737e85c82a327b_Out_0 = IsGammaSpace() ? LinearToSRGB(_BaseColor) : _BaseColor;
+            UnityTexture2D _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0 = UnityBuildTexture2DStructNoScale(_Albedo);
+            float4 _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0 = SAMPLE_TEXTURE2D(_Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.tex, _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.samplerstate, _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.GetTransformedUV(IN.uv0.xy));
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_R_4 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.r;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_G_5 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.g;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_B_6 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.b;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_A_7 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.a;
+            float4 _Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2;
+            Unity_Multiply_float4_float4(_Property_6c461982439644bf9d737e85c82a327b_Out_0, _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0, _Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2);
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
+            float _Property_f8fea11957cb45fb9a6b469138c89e78_Out_0 = _DissolveWidth;
+            float _Add_3f205e5c254a4dab86e55a3f8486e591_Out_2;
+            Unity_Add_float(_Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0, _Property_f8fea11957cb45fb9a6b469138c89e78_Out_0, _Add_3f205e5c254a4dab86e55a3f8486e591_Out_2);
+            float _Step_00d1d74712cc43f280e6203217c66678_Out_2;
+            Unity_Step_float(_SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2, _Add_3f205e5c254a4dab86e55a3f8486e591_Out_2, _Step_00d1d74712cc43f280e6203217c66678_Out_2);
+            float4 _Property_111a2d0fa9c7413eb72077338e57d2b3_Out_0 = IsGammaSpace() ? LinearToSRGB(_DissolveColor) : _DissolveColor;
+            float4 _Multiply_ae449395d456404fb648f2f15296b8a2_Out_2;
+            Unity_Multiply_float4_float4((_Step_00d1d74712cc43f280e6203217c66678_Out_2.xxxx), _Property_111a2d0fa9c7413eb72077338e57d2b3_Out_0, _Multiply_ae449395d456404fb648f2f15296b8a2_Out_2);
+            float _Property_341fe6c6f5da4941b180b17d3c652d43_Out_0 = _Metallic;
+            float _Property_83f2031ef51844d8bb56e3c562f7d67e_Out_0 = _Smoothness;
+            surface.BaseColor = (_Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2.xyz);
             surface.NormalTS = IN.TangentSpaceNormal;
-            surface.Emission = float3(0, 0, 0);
-            surface.Metallic = 0;
-            surface.Smoothness = 0.5;
+            surface.Emission = (_Multiply_ae449395d456404fb648f2f15296b8a2_Out_2.xyz);
+            surface.Metallic = _Property_341fe6c6f5da4941b180b17d3c652d43_Out_0;
+            surface.Specular = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : SRGBToLinear(float3(0.5, 0.5, 0.5));
+            surface.Smoothness = _Property_83f2031ef51844d8bb56e3c562f7d67e_Out_0;
             surface.Occlusion = 1;
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         
@@ -3977,7 +4303,7 @@ Shader "Custom/DissolveS123hader"
             }
         
         // Render State
-        Cull Back
+        Cull [_Cull]
         ZTest LEqual
         ZWrite On
         ColorMask 0
@@ -4002,6 +4328,7 @@ Shader "Custom/DissolveS123hader"
         
         // Keywords
         #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
         // GraphKeywords: <None>
         
         // Defines
@@ -4016,7 +4343,6 @@ Shader "Custom/DissolveS123hader"
         #define FEATURES_GRAPH_VERTEX
         /* WARNING: $splice Could not find named fragment 'PassInstancing' */
         #define SHADERPASS SHADERPASS_SHADOWCASTER
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -4144,11 +4470,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -4262,11 +4601,12 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         
@@ -4339,7 +4679,7 @@ Shader "Custom/DissolveS123hader"
             }
         
         // Render State
-        Cull Back
+        Cull [_Cull]
         ZTest LEqual
         ZWrite On
         ColorMask 0
@@ -4363,7 +4703,7 @@ Shader "Custom/DissolveS123hader"
         // HybridV1InjectedBuiltinProperties: <None>
         
         // Keywords
-        // PassKeywords: <None>
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
         // GraphKeywords: <None>
         
         // Defines
@@ -4377,7 +4717,6 @@ Shader "Custom/DissolveS123hader"
         #define FEATURES_GRAPH_VERTEX
         /* WARNING: $splice Could not find named fragment 'PassInstancing' */
         #define SHADERPASS SHADERPASS_DEPTHONLY
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -4501,11 +4840,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -4619,11 +4971,12 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         
@@ -4696,7 +5049,7 @@ Shader "Custom/DissolveS123hader"
             }
         
         // Render State
-        Cull Back
+        Cull [_Cull]
         ZTest LEqual
         ZWrite On
         
@@ -4719,7 +5072,7 @@ Shader "Custom/DissolveS123hader"
         // HybridV1InjectedBuiltinProperties: <None>
         
         // Keywords
-        // PassKeywords: <None>
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
         // GraphKeywords: <None>
         
         // Defines
@@ -4736,7 +5089,6 @@ Shader "Custom/DissolveS123hader"
         #define FEATURES_GRAPH_VERTEX
         /* WARNING: $splice Could not find named fragment 'PassInstancing' */
         #define SHADERPASS SHADERPASS_DEPTHNORMALS
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -4870,11 +5222,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -4989,12 +5354,13 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
             surface.NormalTS = IN.TangentSpaceNormal;
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         
@@ -5089,6 +5455,7 @@ Shader "Custom/DissolveS123hader"
         
         // Keywords
         #pragma shader_feature _ EDITOR_VISUALIZATION
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
         // GraphKeywords: <None>
         
         // Defines
@@ -5107,7 +5474,6 @@ Shader "Custom/DissolveS123hader"
         /* WARNING: $splice Could not find named fragment 'PassInstancing' */
         #define SHADERPASS SHADERPASS_META
         #define _FOG_FRAGMENT 1
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -5242,11 +5608,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -5263,6 +5642,11 @@ Shader "Custom/DissolveS123hader"
         #endif
         
         // Graph Functions
+        
+        void Unity_Multiply_float4_float4(float4 A, float4 B, out float4 Out)
+        {
+            Out = A * B;
+        }
         
         
         inline float Unity_SimpleNoise_RandomValue_float (float2 uv)
@@ -5321,6 +5705,16 @@ Shader "Custom/DissolveS123hader"
             Out = t;
         }
         
+        void Unity_Add_float(float A, float B, out float Out)
+        {
+            Out = A + B;
+        }
+        
+        void Unity_Step_float(float Edge, float In, out float Out)
+        {
+            Out = step(Edge, In);
+        }
+        
         // Custom interpolators pre vertex
         /* WARNING: $splice Could not find named fragment 'CustomInterpolatorPreVertex' */
         
@@ -5362,13 +5756,31 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
-            surface.BaseColor = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : SRGBToLinear(float3(0.5, 0.5, 0.5));
-            surface.Emission = float3(0, 0, 0);
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            float4 _Property_6c461982439644bf9d737e85c82a327b_Out_0 = IsGammaSpace() ? LinearToSRGB(_BaseColor) : _BaseColor;
+            UnityTexture2D _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0 = UnityBuildTexture2DStructNoScale(_Albedo);
+            float4 _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0 = SAMPLE_TEXTURE2D(_Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.tex, _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.samplerstate, _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.GetTransformedUV(IN.uv0.xy));
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_R_4 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.r;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_G_5 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.g;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_B_6 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.b;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_A_7 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.a;
+            float4 _Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2;
+            Unity_Multiply_float4_float4(_Property_6c461982439644bf9d737e85c82a327b_Out_0, _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0, _Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2);
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
+            float _Property_f8fea11957cb45fb9a6b469138c89e78_Out_0 = _DissolveWidth;
+            float _Add_3f205e5c254a4dab86e55a3f8486e591_Out_2;
+            Unity_Add_float(_Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0, _Property_f8fea11957cb45fb9a6b469138c89e78_Out_0, _Add_3f205e5c254a4dab86e55a3f8486e591_Out_2);
+            float _Step_00d1d74712cc43f280e6203217c66678_Out_2;
+            Unity_Step_float(_SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2, _Add_3f205e5c254a4dab86e55a3f8486e591_Out_2, _Step_00d1d74712cc43f280e6203217c66678_Out_2);
+            float4 _Property_111a2d0fa9c7413eb72077338e57d2b3_Out_0 = IsGammaSpace() ? LinearToSRGB(_DissolveColor) : _DissolveColor;
+            float4 _Multiply_ae449395d456404fb648f2f15296b8a2_Out_2;
+            Unity_Multiply_float4_float4((_Step_00d1d74712cc43f280e6203217c66678_Out_2.xxxx), _Property_111a2d0fa9c7413eb72077338e57d2b3_Out_0, _Multiply_ae449395d456404fb648f2f15296b8a2_Out_2);
+            surface.BaseColor = (_Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2.xyz);
+            surface.Emission = (_Multiply_ae449395d456404fb648f2f15296b8a2_Out_2.xyz);
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         
@@ -5462,7 +5874,7 @@ Shader "Custom/DissolveS123hader"
         // HybridV1InjectedBuiltinProperties: <None>
         
         // Keywords
-        // PassKeywords: <None>
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
         // GraphKeywords: <None>
         
         // Defines
@@ -5478,7 +5890,6 @@ Shader "Custom/DissolveS123hader"
         #define SHADERPASS SHADERPASS_DEPTHONLY
         #define SCENESELECTIONPASS 1
         #define ALPHA_CLIP_THRESHOLD 1
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -5602,11 +6013,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -5720,11 +6144,12 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         
@@ -5797,7 +6222,7 @@ Shader "Custom/DissolveS123hader"
             }
         
         // Render State
-        Cull Back
+        Cull [_Cull]
         
         // Debug
         // <None>
@@ -5818,7 +6243,7 @@ Shader "Custom/DissolveS123hader"
         // HybridV1InjectedBuiltinProperties: <None>
         
         // Keywords
-        // PassKeywords: <None>
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
         // GraphKeywords: <None>
         
         // Defines
@@ -5834,7 +6259,6 @@ Shader "Custom/DissolveS123hader"
         #define SHADERPASS SHADERPASS_DEPTHONLY
         #define SCENEPICKINGPASS 1
         #define ALPHA_CLIP_THRESHOLD 1
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -5958,11 +6382,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -6076,11 +6513,12 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         
@@ -6153,10 +6591,10 @@ Shader "Custom/DissolveS123hader"
             }
         
         // Render State
-        Cull Back
-        Blend One Zero
-        ZTest LEqual
-        ZWrite On
+        Cull [_Cull]
+        Blend [_SrcBlend] [_DstBlend]
+        ZTest [_ZTest]
+        ZWrite [_ZWrite]
         
         // Debug
         // <None>
@@ -6177,7 +6615,7 @@ Shader "Custom/DissolveS123hader"
         // HybridV1InjectedBuiltinProperties: <None>
         
         // Keywords
-        // PassKeywords: <None>
+        #pragma shader_feature_local_fragment _ _ALPHATEST_ON
         // GraphKeywords: <None>
         
         // Defines
@@ -6191,7 +6629,6 @@ Shader "Custom/DissolveS123hader"
         #define FEATURES_GRAPH_VERTEX
         /* WARNING: $splice Could not find named fragment 'PassInstancing' */
         #define SHADERPASS SHADERPASS_2D
-        #define _ALPHATEST_ON 1
         /* WARNING: $splice Could not find named fragment 'DotsInstancingVars' */
         
         
@@ -6315,11 +6752,24 @@ Shader "Custom/DissolveS123hader"
         
         // Graph Properties
         CBUFFER_START(UnityPerMaterial)
-        float _AlphaClip;
-        float _Dissolove_Size;
+        float4 _BaseColor;
+        float4 _Albedo_TexelSize;
+        float _Metallic;
+        float _Smoothness;
+        float4 _Normal_TexelSize;
+        float _NormalStrength;
+        float _DissolveScale;
+        float _DissolveAmount;
+        float _DissolveWidth;
+        float4 _DissolveColor;
         CBUFFER_END
         
         // Object and Global properties
+        SAMPLER(SamplerState_Linear_Repeat);
+        TEXTURE2D(_Albedo);
+        SAMPLER(sampler_Albedo);
+        TEXTURE2D(_Normal);
+        SAMPLER(sampler_Normal);
         
         // Graph Includes
         // GraphIncludes: <None>
@@ -6336,6 +6786,11 @@ Shader "Custom/DissolveS123hader"
         #endif
         
         // Graph Functions
+        
+        void Unity_Multiply_float4_float4(float4 A, float4 B, out float4 Out)
+        {
+            Out = A * B;
+        }
         
         
         inline float Unity_SimpleNoise_RandomValue_float (float2 uv)
@@ -6434,12 +6889,22 @@ Shader "Custom/DissolveS123hader"
         SurfaceDescription SurfaceDescriptionFunction(SurfaceDescriptionInputs IN)
         {
             SurfaceDescription surface = (SurfaceDescription)0;
-            float _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            Unity_SimpleNoise_float(IN.uv0.xy, -70.8, _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2);
-            float _Property_ea4ef8aa284341d49ae087df786ede09_Out_0 = _AlphaClip;
-            surface.BaseColor = IsGammaSpace() ? float3(0.5, 0.5, 0.5) : SRGBToLinear(float3(0.5, 0.5, 0.5));
-            surface.Alpha = _SimpleNoise_e0b54e2436dd4687b718ff3391e7d15a_Out_2;
-            surface.AlphaClipThreshold = _Property_ea4ef8aa284341d49ae087df786ede09_Out_0;
+            float4 _Property_6c461982439644bf9d737e85c82a327b_Out_0 = IsGammaSpace() ? LinearToSRGB(_BaseColor) : _BaseColor;
+            UnityTexture2D _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0 = UnityBuildTexture2DStructNoScale(_Albedo);
+            float4 _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0 = SAMPLE_TEXTURE2D(_Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.tex, _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.samplerstate, _Property_5d3c267a3f4e44358d25e8bcc8cc5350_Out_0.GetTransformedUV(IN.uv0.xy));
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_R_4 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.r;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_G_5 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.g;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_B_6 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.b;
+            float _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_A_7 = _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0.a;
+            float4 _Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2;
+            Unity_Multiply_float4_float4(_Property_6c461982439644bf9d737e85c82a327b_Out_0, _SampleTexture2D_6b95ddba314b4c939a5b993dd5c66fe6_RGBA_0, _Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2);
+            float _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0 = _DissolveScale;
+            float _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            Unity_SimpleNoise_float(IN.uv0.xy, _Property_3af3be1980f84d129ade93dca24e4ee7_Out_0, _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2);
+            float _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0 = _DissolveAmount;
+            surface.BaseColor = (_Multiply_d1b8db1e24a2477a84065726d586ccbc_Out_2.xyz);
+            surface.Alpha = _SimpleNoise_c64f71866553420fb72f52334c2f44ff_Out_2;
+            surface.AlphaClipThreshold = _Property_09bb1f3d2bfc401ea536743433b12cc9_Out_0;
             return surface;
         }
         

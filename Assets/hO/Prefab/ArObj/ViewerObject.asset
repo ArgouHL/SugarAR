@@ -18,10 +18,10 @@ MonoBehaviour:
       type: 3}
     orgRotation: {x: -20, y: 0, z: 0}
   - keyName: Ch3_AR_2
-    spawnObject: {fileID: 7578673937241140057, guid: 04e29765c0640c7478b5aac01f0c151e,
+    spawnObject: {fileID: 7578673937241140057, guid: 3764915ac7610584085c9ea9c20ebf0c,
       type: 3}
-    orgRotation: {x: 0, y: 0, z: 0}
+    orgRotation: {x: -20, y: 0, z: 0}
   - keyName: Ch3_AR_3
-    spawnObject: {fileID: 7578673937241140057, guid: 04e29765c0640c7478b5aac01f0c151e,
+    spawnObject: {fileID: 7578673937241140057, guid: 6a171ca94cf007c44939cddc5633c6ab,
       type: 3}
-    orgRotation: {x: 0, y: 0, z: 0}
+    orgRotation: {x: -20, y: 0, z: 0}

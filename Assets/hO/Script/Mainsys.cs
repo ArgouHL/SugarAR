@@ -11,26 +11,26 @@ public class Mainsys : MonoBehaviour
     {
         instance = this;
     }
-
-    public void TestAR()
+    public void Start()
     {
-
-        b = !b;
- 
-        EnableAR(b);
-        EnableObjectView(!b);
+        EnableAR(false, null);
     }
 
-    public void EnableAR(bool enable)
+    public void EnableAR(bool enable, string targetName)
     {
-        ArsystemCtr.instance.Test(enable);
-        BackGroundManager.instance.EnableBackGround(!enable);
+        Debug.Log("EnableAR " + enable);
+        if (!enable)
+            LeanTween.delayedCall(1.2f, () => ArsystemCtr.instance.SetEnable(enable));
+        else
+            ArsystemCtr.instance.SetEnable(enable);
+        BackGroundManager.instance.EnableBackGround(!enable, 1);
+        ImageTrackingCtr.instance.SetTarget(targetName);
     }
 
     public void EnableObjectView(bool enable)
     {
         ViewerObjectManager.instance.Test(enable);
-        
+
     }
 
 

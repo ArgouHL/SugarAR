@@ -18,7 +18,7 @@ public class ViewerObjectManager : MonoBehaviour
 
     private void Start()
     {
-        dissolveMaterial.SetFloat("_AlphaClip", 1);
+        dissolveMaterial.SetFloat("_DissolveAmount", 1);
     }
 
     public void SpawnViewerObject(ViewerObject viewerObject)
@@ -48,10 +48,10 @@ public class ViewerObjectManager : MonoBehaviour
     public void DestroyViewerObject()
     {
         if (nowViewerObject == null)
-        {
+            return;
             Destroy(nowViewerObject);
             nowViewerObject = null;
-        }
+        
     }
 
     public void Test(bool b)
@@ -64,10 +64,10 @@ public class ViewerObjectManager : MonoBehaviour
 
     private void Dissolve(float target, float duration, Action action = null)
     {
-        LeanTween.value(dissolveMaterial.GetFloat("_AlphaClip"), target, duration)
+        LeanTween.value(dissolveMaterial.GetFloat("_DissolveAmount"), target, duration)
             .setOnUpdate((float val) =>
             {
-                dissolveMaterial.SetFloat("_AlphaClip", val);
+                dissolveMaterial.SetFloat("_DissolveAmount", val);
                 Debug.Log(val);
             }).setOnComplete(() =>
 
@@ -75,6 +75,8 @@ public class ViewerObjectManager : MonoBehaviour
              if (action != null)
                  action.Invoke();
          });
+
+
     }
 
 }

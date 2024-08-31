@@ -66,7 +66,7 @@ public class NpcControl  : MonoBehaviour
     internal void Gray()
     {
         npcImage.color = grayColor;
-        Debug.Log(gameObject.name + "Gray");
+     //   Debug.Log(gameObject.name + "Gray");
 
     }
 

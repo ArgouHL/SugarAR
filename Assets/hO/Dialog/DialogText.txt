@@ -4,8 +4,7 @@
 
 
 
-//[Start:Unit1][Music:A][Sfx:0][NPC:0][Button:Yes,No][Action]
-
+//[Start:Unit1][Music:A][Sfx:0][NPC:0][Button:Yes,No][Action:AR,Ch3_AR_1]
 
 [Start:Unit3_0]
 [Setting:NPC_On]
@@ -19,11 +18,11 @@
 [Dialog]好，那我問你，整個過程第一步是什麼？
 [NPC:5,0]
 [Dialog](沒記錯的話一開始不是直接煮麥芽，而是蒸糯米。）
-[Action:AR]
+[Action:AR,Ch3_AR_1]
 [Setting:NPC_Off]
 [Setting:Click_Disable]
 [NPC:0]
-[Dialog](請掃)
+[Dialog]請找出要蒸煮的糯米
 [End]
 
 
@@ -40,11 +39,16 @@
 
 [Start:Unit3_1]
 [Setting:NPC_On]
+[Setting:Click_Enable]
 [NPC:6,0]
 [Dialog]那接下來，第二步又是什麼？
 [NPC:5,0]
 [Dialog]（蒸好糯米，就是加麥芽了吧，但記得麥芽不是直接拿去煮的）
-[Action:AR]
+[Action:AR,Ch3_AR_2]
+[Setting:NPC_Off]
+[Setting:Click_Disable]
+[NPC:0]
+[Dialog]請找出混合了的麥芽和糯米
 [End]
 
 [Start:Unit3_Ani_2]
@@ -54,7 +58,6 @@
 [AutoNext:2]
 [Dialog]之後就是把小麥和蒸好的糯米混合，加水靜置。
 [NPC:6,0]
-[AutoNext:2]
 [Dialog]對但不完全對，小麥要泡水發芽，打碎後混合放涼後的糯米，加水靜置發酵。
 [Setting:Click_Enable]
 [End]
@@ -66,7 +69,12 @@
 [Dialog]但是發酵完並不就是麥芽糖了，還有一步才會是真正的麥芽糖。
 [NPC:5,0]
 [Dialog]（發酵好的麥芽糖水還有很多渣和還很水，之後就是要把麥芽糖水變稠。）
-[Action:AR]
+[Dialog]（記得好像是先要過濾的?）
+[Action:AR,Ch3_AR_3]
+[Setting:NPC_Off]
+[Setting:Click_Disable]
+[NPC:0]
+[Dialog]請找出過濾麥芽糖水機器
 [End]
 
 
@@ -80,7 +88,6 @@
 [AutoNext:2]
 [Dialog]不只有過濾，還有脫渣，把所有菁華原汁都搾取出來，連續柴燒十幾個小時，淬煉當中的菁華。
 [NPC:6,0]
-[AutoNext:2]
 [Dialog]完成淬煉後，最後才成為金黃的麥芽糖膏。。
 [Setting:Click_Enable]
 [End]

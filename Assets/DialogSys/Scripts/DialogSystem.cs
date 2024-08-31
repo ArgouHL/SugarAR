@@ -53,6 +53,7 @@ public class DialogSystem : MonoBehaviour
     public static DialogActions closeDialogAction;
     public static DialogActions closeDialogAction_Once;
 
+    public float dialogCoolDown;
 
     private bool canClick = true;
 
@@ -166,6 +167,7 @@ public class DialogSystem : MonoBehaviour
 
     public void SetDialog(ref int dialogueIndex)
     {
+
         Dialogue dialogue = allDialogue[dialogueIndex];
         switch (dialogue.tag)
         {
@@ -186,7 +188,7 @@ public class DialogSystem : MonoBehaviour
                 NextDialog();
                 break;
             case DialogueTag.Dialog:
-                dialogField.text = dialogue.content;
+                ShowDialog(dialogue.content);
                 break;
             case DialogueTag.Action:
                 DialogAction(dialogue);
@@ -203,6 +205,15 @@ public class DialogSystem : MonoBehaviour
         }
 
 
+    }
+
+    private void ShowDialog(string content)
+    {
+
+        if (canClick)
+            LeanTween.delayedCall(dialogCoolDown, () => canClick = true);
+        canClick = false;
+        dialogField.text = content;
     }
 
     private void AutoToNextDialog(Dialogue dialogue)
@@ -310,7 +321,7 @@ public class DialogSystem : MonoBehaviour
         switch(dialogue.setting[0])
         {
             case "AR":
-                Mainsys.instance.EnableAR(true);
+                Mainsys.instance.EnableAR(true, dialogue.setting[1]);
                 break;
         }
     }

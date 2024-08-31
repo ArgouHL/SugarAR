@@ -16,8 +16,13 @@ public class ArsystemCtr : MonoBehaviour
         arSession = FindObjectOfType<ARSession>();
     }
 
-    public void Test(bool e)
+    public void SetEnable(bool e)
     {
+        if (!e)
+        {
+            ImageTrackingCtr.instance.ResetAR();
+        }
         arSession.enabled = e;
+        
     }
 }

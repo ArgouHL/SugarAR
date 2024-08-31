@@ -10,7 +10,7 @@ public class BackGroundManager : MonoBehaviour
     public Image backGroundImg;
     public GameObject backGround => backGroundImg.gameObject;
     public BackGroundList backGroundList;
-
+    public CanvasGroup cg;
     private Dictionary<string, BackGroundItem> backGroundItems = new();
     private void Awake()
     {
@@ -48,11 +48,11 @@ public class BackGroundManager : MonoBehaviour
 
     }
 
-    public void EnableBackGround(bool b)
+    public void EnableBackGround(bool b, float fadeDuration=2)
     {
-        backGround.SetActive(b);
+        LeanTween.value((!b).GetHashCode(), b.GetHashCode(), fadeDuration).setOnUpdate((float val) => cg.alpha = val);
     }
 
 
 
-}
+}   

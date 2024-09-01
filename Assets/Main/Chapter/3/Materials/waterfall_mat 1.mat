@@ -74,7 +74,7 @@ Material:
     - _lightLength: -1
     - _lightLengthF: -0.6
     m_Colors:
-    - _BColor: {r: 0.837073, g: 0.8396226, b: 0.17954186, a: 1}
+    - _BColor: {r: 0.79910296, g: 0.45641106, b: 0.23074007, a: 1}
     - _VColor: {r: 0.3301887, g: 0.26440296, b: 0.09552627, a: 1}
     - _VSpeed: {r: 0, g: 2, b: 0, a: 0}
     - _VTilling: {r: 3, g: 2, b: 0, a: 0}

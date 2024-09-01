@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ChapterManager : MonoBehaviour
 {
@@ -32,5 +33,12 @@ public class ChapterManager : MonoBehaviour
     {
         DialogSystem.instance.StartDialog(dialogs[dialogIndex]);
         dialogIndex++;
+    }
+
+
+    internal static void LoadScene(string v)
+    {
+
+        FadeControl.instance.FadeOut(() =>SceneManager.LoadScene(v));
     }
 }

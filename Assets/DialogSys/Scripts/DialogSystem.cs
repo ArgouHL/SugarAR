@@ -52,10 +52,12 @@ public class DialogSystem : MonoBehaviour
     public static DialogActions dialogAction;
     public static DialogActions closeDialogAction;
     public static DialogActions closeDialogAction_Once;
-
+    public static DialogActions onClickActions;
+    public static DialogActions onEndActions;
     public float dialogCoolDown;
 
-    private bool canClick = true;
+    public CanvasGroup fakeNextBtn;
+    private bool canClick = false;
 
     private void Awake()
     {
@@ -135,6 +137,7 @@ public class DialogSystem : MonoBehaviour
         closeDialogAction?.Invoke();
         closeDialogAction_Once?.Invoke();
         closeDialogAction_Once = null;
+
     }
     private void OpenDialog()
     {
@@ -211,8 +214,8 @@ public class DialogSystem : MonoBehaviour
     {
 
         if (canClick)
-            LeanTween.delayedCall(dialogCoolDown, () => canClick = true);
-        canClick = false;
+            LeanTween.delayedCall(dialogCoolDown, () => EnableClick(true));
+        EnableClick(false);
         dialogField.text = content;
     }
 
@@ -235,10 +238,10 @@ public class DialogSystem : MonoBehaviour
                 nPCActionManager.NpcEnable(false);
                 break;
             case "Click_Enable":
-                canClick = true;
+                EnableClick(true);
                 break;
             case "Click_Disable":
-                canClick = false;
+                EnableClick(false);
                 break;
 
 
@@ -309,11 +312,13 @@ public class DialogSystem : MonoBehaviour
         if (!canClick)
             return;
         NextDialog();
+        onClickActions?.Invoke();
     }
 
     internal void EnableClick(bool b)
     {
         canClick = b;
+        fakeNextBtn.alpha = b ? 1 : 0;
     }
 
     private void DialogAction(Dialogue dialogue)
@@ -323,8 +328,12 @@ public class DialogSystem : MonoBehaviour
             case "AR":
                 Mainsys.instance.EnableAR(true, dialogue.setting[1]);
                 break;
+            case "Scene":
+                ChapterManager.LoadScene(dialogue.setting[1]);
+                break;
         }
     }
+
 
 }
 

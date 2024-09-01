@@ -9,10 +9,12 @@ public class FadeControl : MonoBehaviour
     public CanvasGroup fadeCanvasGroup;
     public float fadeTime;
     public LeanTweenType fademode;
-
+    public float startAlphal=1;
+    public Color startColor=Color.black;
     private void Awake()
     {
         instance = this;
+        fadeCanvasGroup.alpha = startAlphal;
 
     }
 
@@ -57,17 +59,17 @@ public class FadeControl : MonoBehaviour
 
     public void FadeOut(Action endAction = null)
     {
-        FadeIn(fadeTime, fademode, endAction);
+        FadeOut(fadeTime, fademode, endAction);
     }
 
     public void FadeOut(float _fadeTime, Action endAction = null)
     {
-        FadeIn(_fadeTime, fademode, endAction);
+        FadeOut(_fadeTime, fademode, endAction);
     }
 
     public void FadeOut(LeanTweenType _fademode, Action endAction = null)
     {
-        FadeIn(fadeTime, _fademode, endAction);
+        FadeOut(fadeTime, _fademode, endAction);
     }
 
     #endregion

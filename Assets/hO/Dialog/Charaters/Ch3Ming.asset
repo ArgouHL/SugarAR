@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   npcSetting:
     index: 5
-    ShowName: "\u5440\u660E"
+    ShowName: "\u963F\u660E"
     alternates:
     - type: 0
       sprite: {fileID: 21300000, guid: da01133c71826264696f958ba20c4206, type: 3}

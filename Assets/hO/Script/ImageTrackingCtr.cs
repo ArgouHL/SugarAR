@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 
+[DefaultExecutionOrder(-1)]
 public class ImageTrackingCtr : MonoBehaviour
 {
     public static ImageTrackingCtr instance;
@@ -15,6 +16,8 @@ public class ImageTrackingCtr : MonoBehaviour
 
     private Dictionary<string, GameObject> spwanedGameObject = new();
     private string tragetArObjectName;
+    public delegate void ScanAction();
+    public static ScanAction OnSuccessScan;
 
     internal void ResetAR()
     {
@@ -76,9 +79,15 @@ public class ImageTrackingCtr : MonoBehaviour
 
         try
         {
-            ViewerObject vo = viewerObjectDict[imageName];
-            ViewerObjectManager.instance.SpawnViewerObject(vo);
-            Mainsys.instance.EnableAR(false, null);
+            
+            ViewerObject vo = viewerObjectDict[imageName];          
+            tragetArObjectName = null;
+            LeanTween.delayedCall(1, () =>
+            {
+                OnSuccessScan?.Invoke();
+                ViewerObjectManager.instance.SpawnViewerObject(vo);
+                Mainsys.instance.EnableAR(false, null);
+            });
 
         }
         catch (Exception err)
@@ -92,10 +101,15 @@ public class ImageTrackingCtr : MonoBehaviour
     {
         if (tragetArObjectName == null || tragetArObjectName == "")
             return;
+
         ViewerObject vo = viewerObjectDict[tragetArObjectName];
-        ViewerObjectManager.instance.SpawnViewerObject(vo);
-        tragetArObjectName = null;
-        Mainsys.instance.EnableAR(false, null);
+        LeanTween.delayedCall(1, () =>
+        {
+            OnSuccessScan?.Invoke();
+            ViewerObjectManager.instance.SpawnViewerObject(vo);
+            Mainsys.instance.EnableAR(false, null);
+        });
+
     }
     
 }

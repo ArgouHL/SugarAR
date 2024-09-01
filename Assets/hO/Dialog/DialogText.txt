@@ -8,6 +8,7 @@
 
 [Start:Unit3_0]
 [Setting:NPC_On]
+[Setting:Click_Enable]
 [NPC:0]
 [Dialog](阿明一邊努力工作，一邊學習學作麥芽糖的工法)
 [NPC:6,0]
@@ -101,6 +102,7 @@
 [Dialog]（看來要成為麥芽糖師傅還有很長的路，我要繼續好好學習！）
 [NPC:0]
 [Dialog]（回到目錄）
+[Action:Scene,menu]
 [End]
 
 

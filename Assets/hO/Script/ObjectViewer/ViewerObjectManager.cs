@@ -24,12 +24,12 @@ public class ViewerObjectManager : MonoBehaviour
 
     public void SpawnViewerObject(ViewerObject viewerObject)
     {
+        
         DestroyViewerObject();
-        nowViewerObject = Instantiate(viewerObject.spawnObject, transform);
+        nowViewerObject = Instantiate(viewerObject.viewerObject, transform);
         viewer.SetLocalRotation(viewerObject.orgRotation.x, viewerObject.orgRotation.y, viewerObject.orgRotation.z);
         viewer.SetEnable(true);
-        nowViewerObject.TryGetComponent<ViewObjectCtr>(out ViewObjectCtr viewObjectCtr);
-        if (viewObjectCtr != null)
+        if(nowViewerObject.TryGetComponent<ViewObjectCtr>(out ViewObjectCtr viewObjectCtr))
         {
             ShowRotatUI(true, 1);
             Dissolve(0, 2f, () => viewObjectCtr.PlayAni());
@@ -37,6 +37,7 @@ public class ViewerObjectManager : MonoBehaviour
 
             LeanTween.delayedCall(viewObjectCtr.aniDuration, () => DialogSystem.instance.EnableClick(true));
         }
+
 
     }
 

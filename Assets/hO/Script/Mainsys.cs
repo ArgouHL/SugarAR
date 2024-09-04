@@ -10,6 +10,9 @@ public class Mainsys : MonoBehaviour
 
 
     public CanvasGroup arUI;
+    public delegate void ActiveAction(bool b);
+    public static ActiveAction OnArEnable;
+
     private void Awake()
     {
         instance = this;
@@ -17,19 +20,29 @@ public class Mainsys : MonoBehaviour
     public void Start()
     {
         EnableAR(false, null);
-        DialogSystem.onClickActions += SfxPlayerControl.instance.PlayClick;
-        ImageTrackingCtr.OnSuccessScan += SfxPlayerControl.instance.PlayCorrect;
+       
         Mainsys.instance.EnableObjectView(false);
     }
 
-    
-
+    private void OnEnable()
+    {
+        DialogSystem.onClickActions += SfxPlayerControl.instance.PlayClick;
+        ImageTrackingCtr.OnSuccessScan += SfxPlayerControl.instance.PlayCorrect;
+        ImageTrackingCtr.OnFailScan += SfxPlayerControl.instance.PlayWorng;
+    }
+    private void OnDisable()
+    {
+        DialogSystem.onClickActions -= SfxPlayerControl.instance.PlayClick;
+        ImageTrackingCtr.OnSuccessScan -= SfxPlayerControl.instance.PlayCorrect;
+        ImageTrackingCtr.OnFailScan -= SfxPlayerControl.instance.PlayWorng;
+    }
 
 
     public void EnableAR(bool enable, string targetName)
     {
         Debug.Log("EnableAR " + enable);
         ShowARUI(enable,1);
+        OnArEnable.Invoke(enable);
         if (!enable)
             LeanTween.delayedCall(1.2f, () => ArsystemCtr.instance.SetEnable(enable));
         else

@@ -8,6 +8,7 @@ public class SfxPlayerControl : MonoBehaviour
     public static SfxPlayerControl instance;
     private AudioSource audioSource;
     public AudioClip correctSfx;
+    public AudioClip worngSfx;
     public AudioClip clickSfx;
     private void Awake()
     {
@@ -32,6 +33,13 @@ public class SfxPlayerControl : MonoBehaviour
         audioSource.PlayOneShot(correctSfx);
 
     }
+
+    public void PlayWorng()
+    {
+        audioSource.PlayOneShot(worngSfx);
+
+    }
+
 
     public void PlayClick()
     {

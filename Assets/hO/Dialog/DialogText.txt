@@ -23,7 +23,7 @@
 [Setting:NPC_Off]
 [Setting:Click_Disable]
 [NPC:0]
-[Dialog]請找出要蒸煮的糯米
+[Dialog]請找出要蒸煮的<color=red><b>糯米</b></color>
 [End]
 
 
@@ -49,7 +49,7 @@
 [Setting:NPC_Off]
 [Setting:Click_Disable]
 [NPC:0]
-[Dialog]請找出混合了的麥芽和糯米
+[Dialog]請找出用來混合用的<color=red><b>麥芽</b></color>
 [End]
 
 [Start:Unit3_Ani_2]
@@ -75,7 +75,7 @@
 [Setting:NPC_Off]
 [Setting:Click_Disable]
 [NPC:0]
-[Dialog]請找出過濾麥芽糖水機器
+[Dialog]請找出<color=red><b>過濾用的機器</b></color>
 [End]
 
 

@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   correctSfx: {fileID: 8300000, guid: 53ed7f680114cf345ba107fd841e3d08, type: 3}
+  worngSfx: {fileID: 8300000, guid: 40541a5e72016b948831a2be62a82764, type: 3}
   clickSfx: {fileID: 8300000, guid: 2ba156aa268f6c44c9c9680b80103571, type: 3}
 --- !u!82 &5283759869934911781
 AudioSource:

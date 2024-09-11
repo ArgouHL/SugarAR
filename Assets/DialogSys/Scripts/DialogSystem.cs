@@ -38,8 +38,8 @@ public class DialogSystem : MonoBehaviour
 
     public CharacterDatasManager characterDatas;
     public Dictionary<int, NpcSetting> npcDict = new();
-
-
+    public CanvasGroup nameCanvasGroup;
+    public RectTransform dialogRect;
     private bool dialogOpened = false;
 
 
@@ -48,14 +48,21 @@ public class DialogSystem : MonoBehaviour
     public NPCActionManager nPCActionManager;
 
     private DialogInput inputActions;
+    private Vector2 clickPos => inputActions.MoblieUI.PressPosition.ReadValue<Vector2>();
+    public float dialogCoolDown;
+
     public delegate void DialogActions();
     public static DialogActions dialogAction;
     public static DialogActions closeDialogAction;
     public static DialogActions closeDialogAction_Once;
+    public static DialogActions onClickActions;
+    public static DialogActions onEndActions;
 
-    public float dialogCoolDown;
 
-    private bool canClick = true;
+    public CanvasGroup fakeNextBtn;
+    private bool canClick = false;
+
+
 
     private void Awake()
     {
@@ -126,7 +133,7 @@ public class DialogSystem : MonoBehaviour
         }
     }
 
-    private void CloseDialog()
+    public void CloseDialog()
     {
         dialogOpened = false;
         canvasGroup.interactable = false;
@@ -135,6 +142,8 @@ public class DialogSystem : MonoBehaviour
         closeDialogAction?.Invoke();
         closeDialogAction_Once?.Invoke();
         closeDialogAction_Once = null;
+        UnShowNpcName();
+        inputActions.Disable();
     }
     private void OpenDialog()
     {
@@ -142,6 +151,7 @@ public class DialogSystem : MonoBehaviour
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1;
+        inputActions.Enable();
     }
 
 
@@ -211,8 +221,8 @@ public class DialogSystem : MonoBehaviour
     {
 
         if (canClick)
-            LeanTween.delayedCall(dialogCoolDown, () => canClick = true);
-        canClick = false;
+            LeanTween.delayedCall(dialogCoolDown, () => EnableClick(true));
+        EnableClick(false);
         dialogField.text = content;
     }
 
@@ -235,10 +245,10 @@ public class DialogSystem : MonoBehaviour
                 nPCActionManager.NpcEnable(false);
                 break;
             case "Click_Enable":
-                canClick = true;
+                EnableClick(true);
                 break;
             case "Click_Disable":
-                canClick = false;
+                EnableClick(false);
                 break;
 
 
@@ -264,6 +274,7 @@ public class DialogSystem : MonoBehaviour
                 npcName = npc.ShowName;
                 if (npc.alternates.Length != 0)
                 {
+
                     int alt = 0;
                     if (dialogue.setting.Length > 1 && int.TryParse(dialogue.setting[1], out int _alt))
                     {
@@ -279,10 +290,11 @@ public class DialogSystem : MonoBehaviour
                     {
                         nPCActionManager.ShowNPC(npc.index, alt);
                     }
-                    
+                    ShowNpcName(npcName);
                 }
                 else
                 {
+                    UnShowNpcName();
                     nPCActionManager.GrayAllNPC();  
                 }
                
@@ -293,7 +305,18 @@ public class DialogSystem : MonoBehaviour
             Debug.LogWarningFormat("NPC index \"{0}\" Error.", dialogue.setting[0]);
         }
 
+      
+    }
+
+    private void ShowNpcName(string npcName)
+    {
+        nameCanvasGroup.alpha = 1;
         nameField.text = npcName;
+    }
+
+    private void UnShowNpcName()
+    {
+        nameCanvasGroup.alpha = 0;
     }
 
     public void NextDialog()
@@ -306,14 +329,18 @@ public class DialogSystem : MonoBehaviour
 
     private void OnClick(InputAction.CallbackContext obj)
     {
+        if (clickPos.y> dialogRect.rect.height) return;
+
         if (!canClick)
             return;
         NextDialog();
+        onClickActions?.Invoke();
     }
 
     internal void EnableClick(bool b)
     {
         canClick = b;
+        fakeNextBtn.alpha = b ? 1 : 0;
     }
 
     private void DialogAction(Dialogue dialogue)
@@ -323,9 +350,19 @@ public class DialogSystem : MonoBehaviour
             case "AR":
                 Mainsys.instance.EnableAR(true, dialogue.setting[1]);
                 break;
+            case "Scene":
+                ChapterManager.LoadScene(dialogue.setting[1]);
+                break;
         }
     }
 
+    public void ShowHint(string hint)
+    {
+        UnShowNpcName();
+        EnableClick(false);
+        dialogField.text = hint ;
+        OpenDialog();
+    }
 }
 
 [Serializable]

@@ -35,6 +35,15 @@ public partial class @DialogInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PressPosition"",
+                    ""type"": ""Value"",
+                    ""id"": ""87c4fd12-4af9-4a6f-85c1-d39fb3a3d42a"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -48,6 +57,17 @@ public partial class @DialogInput: IInputActionCollection2, IDisposable
                     ""action"": ""Press"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1e29bc1c-6030-4f80-a3e9-c987bde3f405"",
+                    ""path"": ""<Touchscreen>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PressPosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -57,6 +77,7 @@ public partial class @DialogInput: IInputActionCollection2, IDisposable
         // MoblieUI
         m_MoblieUI = asset.FindActionMap("MoblieUI", throwIfNotFound: true);
         m_MoblieUI_Press = m_MoblieUI.FindAction("Press", throwIfNotFound: true);
+        m_MoblieUI_PressPosition = m_MoblieUI.FindAction("PressPosition", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -119,11 +140,13 @@ public partial class @DialogInput: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_MoblieUI;
     private List<IMoblieUIActions> m_MoblieUIActionsCallbackInterfaces = new List<IMoblieUIActions>();
     private readonly InputAction m_MoblieUI_Press;
+    private readonly InputAction m_MoblieUI_PressPosition;
     public struct MoblieUIActions
     {
         private @DialogInput m_Wrapper;
         public MoblieUIActions(@DialogInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @Press => m_Wrapper.m_MoblieUI_Press;
+        public InputAction @PressPosition => m_Wrapper.m_MoblieUI_PressPosition;
         public InputActionMap Get() { return m_Wrapper.m_MoblieUI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -136,6 +159,9 @@ public partial class @DialogInput: IInputActionCollection2, IDisposable
             @Press.started += instance.OnPress;
             @Press.performed += instance.OnPress;
             @Press.canceled += instance.OnPress;
+            @PressPosition.started += instance.OnPressPosition;
+            @PressPosition.performed += instance.OnPressPosition;
+            @PressPosition.canceled += instance.OnPressPosition;
         }
 
         private void UnregisterCallbacks(IMoblieUIActions instance)
@@ -143,6 +169,9 @@ public partial class @DialogInput: IInputActionCollection2, IDisposable
             @Press.started -= instance.OnPress;
             @Press.performed -= instance.OnPress;
             @Press.canceled -= instance.OnPress;
+            @PressPosition.started -= instance.OnPressPosition;
+            @PressPosition.performed -= instance.OnPressPosition;
+            @PressPosition.canceled -= instance.OnPressPosition;
         }
 
         public void RemoveCallbacks(IMoblieUIActions instance)
@@ -163,5 +192,6 @@ public partial class @DialogInput: IInputActionCollection2, IDisposable
     public interface IMoblieUIActions
     {
         void OnPress(InputAction.CallbackContext context);
+        void OnPressPosition(InputAction.CallbackContext context);
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 
+[DefaultExecutionOrder(-1)]
 public class ImageTrackingCtr : MonoBehaviour
 {
     public static ImageTrackingCtr instance;
@@ -13,12 +14,17 @@ public class ImageTrackingCtr : MonoBehaviour
     public ViewerScriptableObject viewerObjList;
     private Dictionary<string, ViewerObject> viewerObjectDict = new();
 
-    private Dictionary<string, GameObject> spwanedGameObject = new();
+    private Dictionary<string, GameObject> spwanedGameObjects = new();
     private string tragetArObjectName;
+
+    public delegate void ScanAction();
+    public static ScanAction OnSuccessScan;
+    public static ScanAction OnFailScan;
 
     internal void ResetAR()
     {
         aRSession.Reset();
+        spwanedGameObjects = new();
     }
 
     private void Awake()
@@ -36,11 +42,15 @@ public class ImageTrackingCtr : MonoBehaviour
     private void OnEnable()
     {
         aRTrackedImageManager.trackedImagesChanged += OnImageChange;
+        ArSelect.OnHit += CheckHit;
     }
     private void OnDisable()
     {
         aRTrackedImageManager.trackedImagesChanged -= OnImageChange;
+        ArSelect.OnHit -= CheckHit;
     }
+
+
 
     public void SetTarget(string target)
     {
@@ -54,48 +64,59 @@ public class ImageTrackingCtr : MonoBehaviour
         foreach (ARTrackedImage aRTrackedImage in args.added)
         {
             UpdateImage(aRTrackedImage);
-            aRTrackedImage.destroyOnRemoval = true;
         }
         foreach (ARTrackedImage aRTrackedImage in args.updated)
         {
-            if(aRTrackedImage.trackingState== UnityEngine.XR.ARSubsystems.TrackingState.Tracking)
             UpdateImage(aRTrackedImage);
         }
 
         foreach (ARTrackedImage aRTrackedImage in args.removed)
         {
-            spwanedGameObject[aRTrackedImage.referenceImage.name].SetActive(false);
+            // spwanedGameObjects[aRTrackedImage.referenceImage.name].SetActive(false);
         }
     }
 
     private void UpdateImage(ARTrackedImage aRTrackedImage)
     {
-        if (tragetArObjectName != aRTrackedImage.referenceImage.name)
+        if (!spwanedGameObjects.ContainsKey(aRTrackedImage.referenceImage.name))
+        {
+            var vo = Instantiate(viewerObjectDict[aRTrackedImage.referenceImage.name].trackObject);
+            spwanedGameObjects.Add(aRTrackedImage.referenceImage.name, vo);
+        }
+        var sgo = spwanedGameObjects[aRTrackedImage.referenceImage.name];
+        sgo.SetActive(true);
+        sgo.transform.position = aRTrackedImage.transform.position;
+        sgo.transform.rotation = aRTrackedImage.transform.rotation;
+    }
+
+    private void CheckHit(string hitName)
+    {
+        var vo = viewerObjectDict[tragetArObjectName];
+        if (vo.trackObject.name != hitName)
+        {
+            DialogSystem.instance.ShowHint(vo.worngHints);
+            OnFailScan?.Invoke();
             return;
-        string imageName = aRTrackedImage.referenceImage.name;
-
-        try
-        {
-            ViewerObject vo = viewerObjectDict[imageName];
-            ViewerObjectManager.instance.SpawnViewerObject(vo);
-            Mainsys.instance.EnableAR(false, null);
-
         }
-        catch (Exception err)
-        {
-            Debug.LogException(err);
-        }
+        DialogSystem.instance.CloseDialog();
+        OnSuccessScan?.Invoke();
+        tragetArObjectName = null;
+        ViewerObjectManager.instance.SpawnViewerObject(vo);
+        Mainsys.instance.EnableAR(false, null);
+
+
     }
 
     [ContextMenu("TEST")]
     public void Test()
     {
-        if (tragetArObjectName == null || tragetArObjectName == "")
-            return;
-        ViewerObject vo = viewerObjectDict[tragetArObjectName];
-        ViewerObjectManager.instance.SpawnViewerObject(vo);
+        var vo = viewerObjectDict[tragetArObjectName];
+        DialogSystem.instance.CloseDialog();
+        OnSuccessScan?.Invoke();
         tragetArObjectName = null;
+        ViewerObjectManager.instance.SpawnViewerObject(vo);
         Mainsys.instance.EnableAR(false, null);
+
     }
-    
+
 }

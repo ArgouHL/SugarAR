@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Ho/Scene/ArTest.unity
     guid: 61a5c6d02cb647748afa9969a8fbcf9f
   - enabled: 1
+    path: Assets/Ho/Scene/Menu.unity
+    guid: 464ea369ef642e44c82eca668745136f
+  - enabled: 1
     path: Assets/Ho/Scene/Ch3.unity
     guid: ff6dbe3bc29cdf44c97399669b67b559
   m_configObjects:

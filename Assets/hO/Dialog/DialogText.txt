@@ -8,6 +8,7 @@
 
 [Start:Unit3_0]
 [Setting:NPC_On]
+[Setting:Click_Enable]
 [NPC:0]
 [Dialog](阿明一邊努力工作，一邊學習學作麥芽糖的工法)
 [NPC:6,0]
@@ -22,7 +23,7 @@
 [Setting:NPC_Off]
 [Setting:Click_Disable]
 [NPC:0]
-[Dialog]請找出要蒸煮的糯米
+[Dialog]請找出要蒸煮的<color=red><b>糯米</b></color>
 [End]
 
 
@@ -48,7 +49,7 @@
 [Setting:NPC_Off]
 [Setting:Click_Disable]
 [NPC:0]
-[Dialog]請找出混合了的麥芽和糯米
+[Dialog]請找出用來混合用的<color=red><b>麥芽</b></color>
 [End]
 
 [Start:Unit3_Ani_2]
@@ -74,7 +75,7 @@
 [Setting:NPC_Off]
 [Setting:Click_Disable]
 [NPC:0]
-[Dialog]請找出過濾麥芽糖水機器
+[Dialog]請找出<color=red><b>過濾用的機器</b></color>
 [End]
 
 
@@ -101,6 +102,7 @@
 [Dialog]（看來要成為麥芽糖師傅還有很長的路，我要繼續好好學習！）
 [NPC:0]
 [Dialog]（回到目錄）
+[Action:Scene,menu]
 [End]
 
 

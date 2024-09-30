@@ -1822,6 +1822,7 @@ Transform:
   - {fileID: 7190795834167699424}
   - {fileID: 543450651724450799}
   - {fileID: 4195623542318040322}
+  - {fileID: 6200741291995080059}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1894628408
@@ -2311,6 +2312,74 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1926285674326410555}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5392700817328030383
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1807791676}
+    m_Modifications:
+    - target: {fileID: 4270216074833182815, guid: 5094d55dcd6af73458adc3b7f87c9fef,
+        type: 3}
+      propertyPath: m_Name
+      value: Peanut_milk__ice
+      objectReference: {fileID: 0}
+    - target: {fileID: 4753408077756306269, guid: 5094d55dcd6af73458adc3b7f87c9fef,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 38.67
+      objectReference: {fileID: 0}
+    - target: {fileID: 4753408077756306269, guid: 5094d55dcd6af73458adc3b7f87c9fef,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.72
+      objectReference: {fileID: 0}
+    - target: {fileID: 4753408077756306269, guid: 5094d55dcd6af73458adc3b7f87c9fef,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4753408077756306269, guid: 5094d55dcd6af73458adc3b7f87c9fef,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 4753408077756306269, guid: 5094d55dcd6af73458adc3b7f87c9fef,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 4753408077756306269, guid: 5094d55dcd6af73458adc3b7f87c9fef,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4753408077756306269, guid: 5094d55dcd6af73458adc3b7f87c9fef,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4753408077756306269, guid: 5094d55dcd6af73458adc3b7f87c9fef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4753408077756306269, guid: 5094d55dcd6af73458adc3b7f87c9fef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4753408077756306269, guid: 5094d55dcd6af73458adc3b7f87c9fef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5094d55dcd6af73458adc3b7f87c9fef, type: 3}
 --- !u!1001 &5519498997644224713
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2457,6 +2526,12 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3770323398907897470, guid: b6d1af46476d26547aeb56a2e7b76272,
     type: 3}
   m_PrefabInstance: {fileID: 6030672808187367579}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6200741291995080059 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4753408077756306269, guid: 5094d55dcd6af73458adc3b7f87c9fef,
+    type: 3}
+  m_PrefabInstance: {fileID: 5392700817328030383}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7108405180246501640
 PrefabInstance:
@@ -2690,16 +2765,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Sweet_Dumplings
-      objectReference: {fileID: 0}
-    - target: {fileID: 3207047110817132664, guid: 7fd6eccd04c6ae743bb3cd53476abdd9,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1.3992772
-      objectReference: {fileID: 0}
-    - target: {fileID: 3207047110817132664, guid: 7fd6eccd04c6ae743bb3cd53476abdd9,
-        type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1.3992772
       objectReference: {fileID: 0}
     - target: {fileID: 3207047110817132664, guid: 7fd6eccd04c6ae743bb3cd53476abdd9,
         type: 3}

@@ -942,6 +942,50 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
+--- !u!1 &934568191
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 934568192}
+  - component: {fileID: 934568193}
+  m_Layer: 0
+  m_Name: InputManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &934568192
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 934568191}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 861.30005, y: 2433.6, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &934568193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 934568191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c83933bd7a8d62746a651da949b90c0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &990424730
 GameObject:
   m_ObjectHideFlags: 0
@@ -1456,7 +1500,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1392697204
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2128,7 +2172,7 @@ PrefabInstance:
     - target: {fileID: 1576164754077683892, guid: 2481eaba91cdb904f8f4d154b2449071,
         type: 3}
       propertyPath: dialogCoolDown
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1576164754077683892, guid: 2481eaba91cdb904f8f4d154b2449071,
         type: 3}
@@ -2585,6 +2629,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   viewerObjList: {fileID: 11400000, guid: 5a5410ebd006aec4295745255c33748e, type: 2}
+  arObject: {fileID: 589110007135337955, guid: bc850ebed85d290498c83331e8f3cfe3, type: 3}
 --- !u!114 &2088170136
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2597,7 +2642,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dea56a9eaadd1c439095de4f9a371cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SerializedLibrary: {fileID: 11400000, guid: d416dfc93cc25294f80d1a5439983f22,
+  m_SerializedLibrary: {fileID: 11400000, guid: 5629f473f6f631044856f5507ccbfddd,
     type: 2}
   m_MaxNumberOfMovingImages: 0
   m_TrackedImagePrefab: {fileID: 0}
@@ -2760,3 +2805,4 @@ SceneRoots:
   - {fileID: 1728456306}
   - {fileID: 480859854}
   - {fileID: 880346336}
+  - {fileID: 934568192}

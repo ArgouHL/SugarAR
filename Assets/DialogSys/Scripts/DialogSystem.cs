@@ -47,8 +47,8 @@ public class DialogSystem : MonoBehaviour
     public CanvasGroup canvasGroup;
     public NPCActionManager nPCActionManager;
 
-    private DialogInput inputActions;
-    private Vector2 clickPos => inputActions.MoblieUI.PressPosition.ReadValue<Vector2>();
+    private PhoneInput input => InputManager.instance.input;
+    private Vector2 clickPos => input.Dialog.TouchPos.ReadValue<Vector2>();
     public float dialogCoolDown;
 
     public delegate void DialogActions();
@@ -67,8 +67,8 @@ public class DialogSystem : MonoBehaviour
     private void Awake()
     {
         SingletonInit();
-        inputActions = new DialogInput();
-        inputActions.Enable();       
+
+        InputManager.instance.EnableInput(InputType.Dialog);
         LoadDialogues();
         LoadAllNpcs();
         CloseDialog();
@@ -77,14 +77,14 @@ public class DialogSystem : MonoBehaviour
 
     private void OnEnable()
     {
-        inputActions.MoblieUI.Press.performed += OnClick;
+        input.Dialog.Touch.performed += OnClick;
         //  textAnimatorPlayer.onTextShowed.AddListener(() => isAllTextShow = true);
     }
 
 
     private void OnDisable()
     {
-        inputActions.MoblieUI.Press.performed -= OnClick;
+        input.Dialog.Touch.performed -= OnClick;
     }
 
     private void LoadDialogues()
@@ -143,7 +143,7 @@ public class DialogSystem : MonoBehaviour
         closeDialogAction_Once?.Invoke();
         closeDialogAction_Once = null;
         UnShowNpcName();
-        inputActions.Disable();
+        InputManager.instance.DisableInput(InputType.Dialog);
     }
     private void OpenDialog()
     {
@@ -151,7 +151,7 @@ public class DialogSystem : MonoBehaviour
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1;
-        inputActions.Enable();
+        InputManager.instance.EnableInput(InputType.Dialog);
     }
 
 

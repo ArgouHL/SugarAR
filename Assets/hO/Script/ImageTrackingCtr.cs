@@ -14,8 +14,10 @@ public class ImageTrackingCtr : MonoBehaviour
     public ViewerScriptableObject viewerObjList;
     private Dictionary<string, ViewerObject> viewerObjectDict = new();
 
-    private Dictionary<string, GameObject> spwanedGameObjects = new();
+    private GameObject spwanedGameObjects;
     private string tragetArObjectName;
+
+    public GameObject arObject;
 
     public delegate void ScanAction();
     public static ScanAction OnSuccessScan;
@@ -24,7 +26,7 @@ public class ImageTrackingCtr : MonoBehaviour
     internal void ResetAR()
     {
         aRSession.Reset();
-        spwanedGameObjects = new();
+        
     }
 
     private void Awake()
@@ -43,6 +45,8 @@ public class ImageTrackingCtr : MonoBehaviour
     {
         aRTrackedImageManager.trackedImagesChanged += OnImageChange;
         ArSelect.OnHit += CheckHit;
+
+
     }
     private void OnDisable()
     {
@@ -78,23 +82,24 @@ public class ImageTrackingCtr : MonoBehaviour
 
     private void UpdateImage(ARTrackedImage aRTrackedImage)
     {
-        if (!spwanedGameObjects.ContainsKey(aRTrackedImage.referenceImage.name))
+        if (aRTrackedImage.referenceImage.name != arObject.name)
+            return;
+        if (spwanedGameObjects==null)
         {
-            var vo = Instantiate(viewerObjectDict[aRTrackedImage.referenceImage.name].trackObject);
-            spwanedGameObjects.Add(aRTrackedImage.referenceImage.name, vo);
+            spwanedGameObjects = Instantiate(arObject);
+          
         }
-        var sgo = spwanedGameObjects[aRTrackedImage.referenceImage.name];
-        sgo.SetActive(true);
-        sgo.transform.position = aRTrackedImage.transform.position;
-        sgo.transform.rotation = aRTrackedImage.transform.rotation;
+        spwanedGameObjects.SetActive(true);
+        spwanedGameObjects.transform.position = aRTrackedImage.transform.position;
+        spwanedGameObjects.transform.rotation = aRTrackedImage.transform.rotation;
     }
 
     private void CheckHit(string hitName)
     {
         var vo = viewerObjectDict[tragetArObjectName];
-        if (vo.trackObject.name != hitName)
+        if (vo.keyName != hitName)
         {
-            DialogSystem.instance.ShowHint(vo.worngHints);
+            DialogSystem.instance.ShowHint(vo.worngHints+":"+ hitName + ":"+ vo.keyName);
             OnFailScan?.Invoke();
             return;
         }

@@ -12,7 +12,6 @@ public class ViewerScriptableObject : ScriptableObject
 public class ViewerObject
 {
     public string keyName;
-    public GameObject trackObject;
     public GameObject viewerObject;
     public Vector3 orgRotation;
     public string worngHints;

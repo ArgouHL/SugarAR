@@ -60,6 +60,7 @@ public class NpcControl  : MonoBehaviour
 
     public void HideNpc()
     {
+        Debug.Log("Hide" + npcImage.name);
         canvasGroup.alpha = 0;
     }
 

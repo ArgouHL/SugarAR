@@ -12,7 +12,10 @@ public class ChapterEnterManager : MonoBehaviour
     private void Start()
     {
         DisableAllChapter();
+        EnableChapter(1);
+        EnableChapter(2);
         EnableChapter(3);
+        EnableChapter(4);
         FadeControl.instance.FadeIn();
     }
 

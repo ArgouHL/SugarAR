@@ -35,6 +35,7 @@ public class NPCActionManager : MonoBehaviour
 
     public void ClearNPCs()
     {
+        Debug.Log("Clear");
         foreach (var npc in npcControls)
         {
             npc.HideNpc();

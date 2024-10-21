@@ -54,7 +54,11 @@ public class ImageTrackingCtr : MonoBehaviour
         ArSelect.OnHit -= CheckHit;
     }
 
-
+    internal void HideArObj()
+    {
+        if (spwanedGameObjects != null)
+            spwanedGameObjects.SetActive(false);
+    }
 
     public void SetTarget(string target)
     {
@@ -76,8 +80,18 @@ public class ImageTrackingCtr : MonoBehaviour
 
         foreach (ARTrackedImage aRTrackedImage in args.removed)
         {
-            // spwanedGameObjects[aRTrackedImage.referenceImage.name].SetActive(false);
+            DisableObject(aRTrackedImage);
         }
+    }
+
+    private void DisableObject(ARTrackedImage aRTrackedImage)
+    {
+        //if (aRTrackedImage.referenceImage.name != arObject.name)
+        //    return;
+        //if (spwanedGameObjects != null)
+        //{
+        //    spwanedGameObjects.SetActive(false);
+        //}
     }
 
     private void UpdateImage(ARTrackedImage aRTrackedImage)
@@ -87,8 +101,11 @@ public class ImageTrackingCtr : MonoBehaviour
         if (spwanedGameObjects==null)
         {
             spwanedGameObjects = Instantiate(arObject);
-          
+            DialogSystem.instance.NextDialog();
+            
         }
+        Mainsys.instance.DiableScanUI();
+
         spwanedGameObjects.SetActive(true);
         spwanedGameObjects.transform.position = aRTrackedImage.transform.position;
         spwanedGameObjects.transform.rotation = aRTrackedImage.transform.rotation;
@@ -99,10 +116,12 @@ public class ImageTrackingCtr : MonoBehaviour
         var vo = viewerObjectDict[tragetArObjectName];
         if (vo.keyName != hitName)
         {
-            DialogSystem.instance.ShowHint(vo.worngHints+":"+ hitName + ":"+ vo.keyName);
+            DialogSystem.instance.ShowHint(vo.worngHints);
             OnFailScan?.Invoke();
             return;
         }
+        Destroy( spwanedGameObjects);
+        spwanedGameObjects = null;
         DialogSystem.instance.CloseDialog();
         OnSuccessScan?.Invoke();
         tragetArObjectName = null;

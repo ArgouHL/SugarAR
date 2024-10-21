@@ -44,9 +44,16 @@ public class Mainsys : MonoBehaviour
         ShowARUI(enable,1);
         OnArEnable.Invoke(enable);
         if (!enable)
+        {
             LeanTween.delayedCall(1.2f, () => ArsystemCtr.instance.SetEnable(enable));
+            ImageTrackingCtr.instance.HideArObj();
+        }
+
         else
+        {
             ArsystemCtr.instance.SetEnable(enable);
+        }
+
         BackGroundManager.instance.EnableBackGround(!enable, 1);
         ImageTrackingCtr.instance.SetTarget(targetName);
     }
@@ -59,6 +66,13 @@ public class Mainsys : MonoBehaviour
         float targetVal = enable ? 1 : 0;
         LeanTween.value(arUI.alpha, targetVal, duration).setOnUpdate((float val) => arUI.alpha = val);
     }
+
+    public void DiableScanUI()
+    {
+        LeanTween.value(arUI.alpha, 0, 1).setOnUpdate((float val) => arUI.alpha = val);
+
+    }
+
 
     public void EnableObjectView(bool enable)
     {

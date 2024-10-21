@@ -171,7 +171,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 27}
   m_SizeDelta: {x: 0, y: 449.7}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!225 &7766722138135648366
@@ -221,7 +221,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 5, y: -20}
-  m_SizeDelta: {x: -70, y: 320}
+  m_SizeDelta: {x: -80, y: 320}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &7442349450272801881
 CanvasRenderer:
@@ -510,8 +510,8 @@ RectTransform:
   m_GameObject: {fileID: 2271337165104567851}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 1
+  m_LocalScale: {x: 1.3, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 803280069632793386}
   m_Father: {fileID: 2046831341783007290}
@@ -653,7 +653,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -18}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &6921401931730705676
@@ -858,13 +858,16 @@ MonoBehaviour:
   nameField: {fileID: 1816162691096450800}
   dialogField: {fileID: 7246917918566205295}
   dialogueTxts:
-  - {fileID: 4900000, guid: ea31bcd93f7b48f4ba71d30bf85acd36, type: 3}
-  characterDatas: {fileID: 11400000, guid: 94cabc2993397094d9488ee9ada9608c, type: 2}
+  - {fileID: 4900000, guid: b1e5900a87e95e84fb87e09115ceb6ba, type: 3}
+  - {fileID: 4900000, guid: adcfdd34053ed474491ac39847c8615c, type: 3}
+  - {fileID: 4900000, guid: 6d1d61500290f804ebea9ddbd74a8ab0, type: 3}
+  - {fileID: 4900000, guid: 0e3151847f853c84f8cc24ff66b6386c, type: 3}
+  characterDatas: {fileID: 11400000, guid: dbfebc3c6a7a2d34685dd96a9288a82f, type: 2}
   nameCanvasGroup: {fileID: 7766722138135648366}
   dialogRect: {fileID: 6932206048734136182}
   canvasGroup: {fileID: 4848013394516814260}
   nPCActionManager: {fileID: 6921401931730705676}
-  dialogCoolDown: 0
+  dialogCoolDown: 0.5
   fakeNextBtn: {fileID: 62148502238769723}
 --- !u!1 &6932206048734136183
 GameObject:
@@ -903,7 +906,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 340}
+  m_SizeDelta: {x: 0, y: 366.05}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!1 &6932206048813909524
 GameObject:
@@ -940,7 +943,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -39.99999, y: 320}
+  m_SizeDelta: {x: -39.99999, y: 352}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &6932206048813909529
 CanvasRenderer:

@@ -244,6 +244,9 @@ public class DialogSystem : MonoBehaviour
             case "NPC_Off":
                 nPCActionManager.NpcEnable(false);
                 break;
+            case "NPC_Clear":
+                nPCActionManager.ClearNPCs();
+                break;
             case "Click_Enable":
                 EnableClick(true);
                 break;
@@ -272,9 +275,10 @@ public class DialogSystem : MonoBehaviour
             {
                 NpcSetting npc = npcDict[npcIndex];
                 npcName = npc.ShowName;
+               
                 if (npc.alternates.Length != 0)
                 {
-
+                     Debug.Log(npcName);
                     int alt = 0;
                     if (dialogue.setting.Length > 1 && int.TryParse(dialogue.setting[1], out int _alt))
                     {
@@ -290,14 +294,20 @@ public class DialogSystem : MonoBehaviour
                     {
                         nPCActionManager.ShowNPC(npc.index, alt);
                     }
+                  
                     ShowNpcName(npcName);
+
                 }
                 else
                 {
-                    UnShowNpcName();
+                
                     nPCActionManager.GrayAllNPC();  
                 }
-               
+                if (npcIndex != 0)
+                    ShowNpcName(npcName);
+                else
+                    UnShowNpcName();
+
             }
         }
         else
@@ -312,6 +322,7 @@ public class DialogSystem : MonoBehaviour
     {
         nameCanvasGroup.alpha = 1;
         nameField.text = npcName;
+        Debug.Log(npcName);
     }
 
     private void UnShowNpcName()

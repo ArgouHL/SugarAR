@@ -103,7 +103,7 @@ Material:
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _Dissolove_Size: 373.43
-    - _DissolveAmount: 0.4945091
+    - _DissolveAmount: 1
     - _DissolveScale: 172.2
     - _DissolveSize: 1
     - _DissolveWidth: 0.02

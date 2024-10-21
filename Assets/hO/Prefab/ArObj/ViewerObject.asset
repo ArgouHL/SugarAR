@@ -14,23 +14,57 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   viewerObjects:
   - keyName: Ch3_AR_1
-    trackObject: {fileID: 4697483054892025324, guid: 28c9eb89f0c3d0b4da9c0880fdd0dce9,
-      type: 3}
     viewerObject: {fileID: 7578673937241140057, guid: 04e29765c0640c7478b5aac01f0c151e,
       type: 3}
     orgRotation: {x: -20, y: 0, z: 0}
     worngHints: "\u8981\u84B8\u716E\u7684\u662F<color=red><b>\u7CEF\u7C73</b></color>\uFF0C\u4E0D\u662F\u9019\u500B"
   - keyName: Ch3_AR_2
-    trackObject: {fileID: 6759284946370474604, guid: 84ab2c80b763fc548aeda337cb3bf88e,
-      type: 3}
     viewerObject: {fileID: 7578673937241140057, guid: 3764915ac7610584085c9ea9c20ebf0c,
       type: 3}
     orgRotation: {x: -20, y: 0, z: 0}
     worngHints: "\u8981\u5148\u628A<color=red><b>\u9EA5\u82BD</b></color>\u627E\u5230\u518D\u8AAA"
   - keyName: Ch3_AR_3
-    trackObject: {fileID: 8397665741986483773, guid: 636f79ac9dcf816449d2130accc5870d,
-      type: 3}
     viewerObject: {fileID: 7578673937241140057, guid: 6a171ca94cf007c44939cddc5633c6ab,
       type: 3}
     orgRotation: {x: -20, y: 0, z: 0}
     worngHints: "\u9019\u597D\u50CF\u4E0D\u662F<color=red>\u904E\u6FFE\u7528\u7684\u6A5F\u5668</b></color>\uFF0C\u518D\u627E\u627E\u770B\u5427\u3002"
+  - keyName: Ch1_AR_1
+    viewerObject: {fileID: 6215047137072009305, guid: c75b4aadd757b5848ae5806a7b532ece,
+      type: 3}
+    orgRotation: {x: -20, y: 0, z: 0}
+    worngHints: "\u6211\u8981\u554F\u7684\u662F<color=red>\u7D05\u8272\u7684\u51B0\u54C1</b></color>"
+  - keyName: Ch1_AR_2
+    viewerObject: {fileID: 634030837308427043, guid: cd45cfce4479283408fdedefc1398dab,
+      type: 3}
+    orgRotation: {x: -20, y: 0, z: 0}
+    worngHints: "\u9019\u4E0D\u662F<color=red><b>\u52A0\u4E0A\u4E86\u82B1\u751F</b></color>\u7684\u51B0\u54C1"
+  - keyName: Ch1_AR_3
+    viewerObject: {fileID: 5989389512169008186, guid: 05db709c837263e4fb21dffb99fc8549,
+      type: 3}
+    orgRotation: {x: -40, y: 0, z: 0}
+    worngHints: "\u9019\u4E0D\u662F<color=red>\u5713\u4ED4\u8C46\u82B1</b></color>\uFF0C\u518D\u627E\u627E\u770B\u5427\u3002"
+  - keyName: Ch2_AR_1
+    viewerObject: {fileID: 2524686345713707827, guid: 78b9e61463d0d3d48bc17a9c16a8d936,
+      type: 3}
+    orgRotation: {x: -20, y: 0, z: 0}
+    worngHints: "\u9019\u4E0D\u662F<color=red>\u7CD6\u846B\u8606</b></color>\uFF0C\u518D\u627E\u627E\u770B\u5427\u3002"
+  - keyName: Ch2_AR_2
+    viewerObject: {fileID: 1317468513741520888, guid: 46dba493f9bdebb4a9cd2a1d8790dbb8,
+      type: 3}
+    orgRotation: {x: -20, y: 0, z: 0}
+    worngHints: "\u9019\u4E0D\u662F<color=red>\u7D05\u8C46\u9905</b></color>\uFF0C\u518D\u627E\u627E\u770B\u5427\u3002"
+  - keyName: Ch4_AR_1
+    viewerObject: {fileID: 7320966541518249288, guid: a26a1789f4d1b3b478ec30ae5d2c1249,
+      type: 3}
+    orgRotation: {x: -30, y: 0, z: 0}
+    worngHints: "\u9019\u4E0D\u662F<color=red>\u751C\u8336</b></color>\uFF0C\u518D\u627E\u627E\u770B\u5427\u3002"
+  - keyName: Ch4_AR_2
+    viewerObject: {fileID: 6105409959498357108, guid: 6ec5802f88e4eb443999f09f4f165db9,
+      type: 3}
+    orgRotation: {x: -30, y: 0, z: 0}
+    worngHints: "\u9019\u4E0D\u662F<color=red>\u751C\u6E6F\u5713</b></color>\uFF0C\u518D\u627E\u627E\u770B\u5427\u3002"
+  - keyName: Ch4_AR_3
+    viewerObject: {fileID: 8028610175487453182, guid: 9960736e47ea56d4ebe00a4934d6d591,
+      type: 3}
+    orgRotation: {x: -40, y: 0, z: 0}
+    worngHints: "\u9019\u4E0D\u662F<color=red>\u516D\u8272\u559C\u7CD6</b></color>\uFF0C\u518D\u627E\u627E\u770B\u5427\u3002"
